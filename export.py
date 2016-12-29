@@ -76,6 +76,18 @@ def export_data(date):
     workbook.save(xls_name)
 
 
+def standardizing(play_count_text):
+    last_idx = 0
+    play_count = 0
+    for i, unit in enumerate([u'亿', u'万']):
+        step = 10000 if i == 0 else 1
+        idx = play_count_text.index(unit)
+        play_count = play_count \
+            + int(play_count_text[last_idx:idx]) * step
+        last_idx = idx + 1
+    return play_count
+
+
 def process_items(workbook, date, category):
     assert 0 <= category <= 4
     param = category2param[category]
@@ -108,7 +120,7 @@ def process_items(workbook, date, category):
         sheet.write(i, 1, name)
         sheet.write(i, 2, item['platformName'])
         sheet.write(i, 3, increase_count/10000)
-        sheet.write(i, 4, play_count)
+        sheet.write(i, 4, standardizing(play_count))
         sheet.write(i, 5, item['days'])
         sheet.write(i, 6, rise_text)
 
