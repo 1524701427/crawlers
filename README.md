@@ -4,13 +4,14 @@
 
 > **安装运行**
 1. 安装虚拟环境
-```
+```shell
 virtualenv env && source env/bin/active
 ```
 2. 安装第三方库
-```
+```shell
 pip install -r requirements.txt -i http://pypi.doubanio.com/simple --trusted-host pypi.doubanio.com
-3. 运行脚本
 ```
+3. 运行脚本
+```shell
 python export.py
 ```
