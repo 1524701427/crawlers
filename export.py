@@ -77,15 +77,14 @@ def export_data(date):
 
 
 def standardizing(play_count_text):
+    last_idx = 0
     play_count = 0
-    last_idx = -1
     if u'亿' in play_count_text:
         idx = play_count_text.index(u'亿')
         play_count = \
             play_count + int(play_count_text[:idx]) * 10000
         last_idx = idx + 1
     elif u'万' in play_count_text:
-        last_idx = last_idx if last_idx != -1 else 0
         idx = play_count_text.index(u'万')
         play_count = \
             play_count + int(play_count_text[last_idx:idx])
