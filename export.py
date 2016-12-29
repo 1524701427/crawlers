@@ -94,11 +94,10 @@ def process_items(workbook, date, category):
         sheet.write(0, i, header)
     for i, item in enumerate(items, 1):
         name = item['name']
-        detail_url = 'http://d.guduomedia.com/m/show/platform/%s' \
+        detail_url = 'http://d.guduomedia.com/m/show/few_play_count/%s' \
             % quote(name.encode('utf-8'))
-        # 多播放平台
         detail_info = client.fetch(detail_url)
-        play_count = int(detail_info.json()[0]['play_count'])
+        play_count = int(detail_info.json()['total_play_count'])
         increase_count = int(item['increaseCount'])
         rise, rise_text = int(item['rise']), ''
         if rise >= 3:
