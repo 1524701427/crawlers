@@ -16,6 +16,9 @@ from gevent import monkey
 from gevent.pool import Pool
 monkey.patch_all()  # noqa
 
+import config
+from mail import mail_multipart
+
 UA = ('Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_1) '
       'AppleWebKit/537.36 (KHTML, like Gecko) Chrome/54.0.2840.98 '
       'Safari/537.36')
@@ -76,6 +79,7 @@ def export_data(date):
         pool.spawn(process_items, workbook, date, i)
     pool.join()
     workbook.save(xls_name)
+    return xls_name
 
 
 def standardizing(play_count_text):
@@ -130,5 +134,10 @@ def process_items(workbook, date, category):
         sheet.write(i, 6, rise_text)
 
 if __name__ == '__main__':
-    yesterday = date.today() - timedelta(days=1)
-    export_data(yesterday)
+    yesterday = date.today() - timedelta(days=2)
+    xls_name = export_data(yesterday)
+    mail = dict()
+    mail['to'] = config.RECEIPTS
+    mail['attach'] = xls_name
+    mail['subject'] = u'影视剧分析统计邮件'
+    mail_multipart(mail)
