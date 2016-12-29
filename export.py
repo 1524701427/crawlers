@@ -3,6 +3,7 @@
 
 '''
 导出数据'''
+from __future__ import unicode_literals
 
 import math
 from urllib import quote
@@ -79,16 +80,16 @@ def export_data(date):
 
 def standardizing(play_count_text):
     last_idx = 0
-    play_count = 0
+    play_count = 0.0
     if u'亿' in play_count_text:
         idx = play_count_text.index(u'亿')
         play_count = \
             play_count + float(play_count_text[:idx]) * 10000
         last_idx = idx + 1
-    elif u'万' in play_count_text:
+    if u'万' in play_count_text:
         idx = play_count_text.index(u'万')
         play_count = \
-            play_count + int(play_count_text[last_idx:idx])
+            play_count + float(play_count_text[last_idx:idx])
     return int(play_count)
 
 
@@ -124,7 +125,7 @@ def process_items(workbook, date, category):
         sheet.write(i, 1, name)
         sheet.write(i, 2, item['platformName'])
         sheet.write(i, 3, int(math.ceil(increase_count/10000.0)))
-        sheet.write(i, 4, standardizing(play_count))
+        sheet.write(i, 4, str(standardizing(play_count)))
         sheet.write(i, 5, item['days'])
         sheet.write(i, 6, rise_text)
 
