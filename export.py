@@ -97,7 +97,7 @@ def process_items(workbook, date, category):
         detail_url = 'http://d.guduomedia.com/m/show/few_play_count/%s' \
             % quote(name.encode('utf-8'))
         detail_info = client.fetch(detail_url)
-        play_count = int(detail_info.json()['total_play_count'])
+        play_count = detail_info.json()['total_play_count']
         increase_count = int(item['increaseCount'])
         rise, rise_text = int(item['rise']), ''
         if rise >= 3:
@@ -108,7 +108,7 @@ def process_items(workbook, date, category):
         sheet.write(i, 1, name)
         sheet.write(i, 2, item['platformName'])
         sheet.write(i, 3, increase_count/10000)
-        sheet.write(i, 4, play_count/10000)
+        sheet.write(i, 4, play_count)
         sheet.write(i, 5, item['days'])
         sheet.write(i, 6, rise_text)
 
