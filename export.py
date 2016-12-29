@@ -134,7 +134,7 @@ def process_items(workbook, date, category):
         sheet.write(i, 6, rise_text)
 
 if __name__ == '__main__':
-    yesterday = date.today() - timedelta(days=2)
+    yesterday = date.today() - timedelta(days=1)
     xls_name = export_data(yesterday)
     mail = dict()
     mail['to'] = config.RECEIPTS
