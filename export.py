@@ -138,6 +138,6 @@ if __name__ == '__main__':
     xls_name = export_data(yesterday)
     mail = dict()
     mail['to'] = config.RECEIPTS
-    mail['attach'] = xls_name
+    mail['attachment'] = xls_name
     mail['subject'] = u'影视剧分析统计邮件'
     mail_multipart(mail)
