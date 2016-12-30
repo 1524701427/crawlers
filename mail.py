@@ -6,6 +6,7 @@
 
 import os
 import smtplib
+import mimetypes
 from email.mime.text import MIMEText
 from email.mime.base import MIMEBase
 from email.mime.multipart import MIMEMultipart
@@ -31,19 +32,25 @@ def mail_multipart(mail):
         raise StandardError(u'请指定收件人')
     multipart = MIMEMultipart()
     if 'attachment' in mail:
-        file_path = mail['attachment']
-        try:
-            with open(file_path, 'rb') as f:
-                data = f.read()
-                file_body = MIMEBase('application', 'octet-stream')
-                file_body.set_payload(data)
-                file_name = os.path.basename(file_path)
-                encode_base64(file_body)
-                file_body.add_header(
-                    'Content-Disposition', 'attachment', filename=file_name)
-                multipart.attach(file_body)
-        except IOError:
-            raise StandardError(u'打开附件失败')
+        file_paths = mail['attachment']
+        for file_path in file_paths:
+            try:
+                with open(file_path, 'rb') as f:
+                    data = f.read()
+                    file_name = os.path.basename(file_path)
+                    content_type = mimetypes.guess_type(file_name)[0]
+                    if content_type is None:
+                        content_type = 'application/octet-stream'
+                    file_body = MIMEBase(*content_type.split('/'))
+                    file_body.set_payload(data)
+                    file_body.add_header(
+                        'Content-Disposition',
+                        'attachment',
+                        filename=file_name)
+                    encode_base64(file_body)
+                    multipart.attach(file_body)
+            except IOError:
+                continue
     if 'text' in mail:
         text = mail['text']
         text = MIMEText(text)
