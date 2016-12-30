@@ -53,7 +53,7 @@ def mail_multipart(mail):
                 continue
     if 'text' in mail:
         text = mail['text']
-        text = MIMEText(text)
+        text = MIMEText(text, 'plain', 'utf-8')
         multipart.attach(text)
     receipts = mail['to']
     sender = mail.get('from', config.QQ_MAIL_ACCOUNT)
