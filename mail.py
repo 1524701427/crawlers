@@ -72,8 +72,4 @@ def mail_multipart(mail):
 
 
 if __name__ == '__main__':
-    mail = dict()
-    mail['to'] = ['wanglanwei@weiche.cn']
-    mail['text'] = '测试邮件'
-    mail['attachment'] = ['requirements.txt']
-    mail_multipart(mail)
+    pass
