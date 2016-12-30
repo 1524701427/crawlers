@@ -3,7 +3,6 @@
 
 '''
 导出数据'''
-from __future__ import unicode_literals
 
 import math
 from urllib import quote
@@ -138,6 +137,6 @@ if __name__ == '__main__':
     xls_name = export_data(yesterday)
     mail = dict()
     mail['to'] = config.RECEIPTS
-    mail['attachment'] = xls_name
+    mail['attachment'] = [xls_name]
     mail['subject'] = u'影视剧分析统计邮件'
     mail_multipart(mail)

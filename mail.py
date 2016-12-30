@@ -46,7 +46,7 @@ def mail_multipart(mail):
                     file_body.add_header(
                         'Content-Disposition',
                         'attachment',
-                        filename=file_name)
+                        filename=file_name.encode('gb2312'))
                     encode_base64(file_body)
                     multipart.attach(file_body)
             except IOError:
