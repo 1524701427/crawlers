@@ -69,6 +69,7 @@ def mail_multipart(mail):
             continue
     else:
         raise StandardError(u'发送邮件失败')
+    server.close()
 
 
 if __name__ == '__main__':
