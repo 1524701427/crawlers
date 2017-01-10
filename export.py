@@ -82,6 +82,8 @@ def export_data(date):
 
 
 def standardizing(play_count_text):
+    if play_count_text is None:
+        return u'未获取到数据'
     last_idx = 0
     play_count = 0.0
     if u'亿' in play_count_text:
@@ -116,8 +118,11 @@ def process_items(workbook, date, category):
         name = item['name']
         detail_url = 'http://d.guduomedia.com/m/show/few_play_count/%s' \
             % quote(name.encode('utf-8'))
-        detail_info = client.fetch(detail_url)
-        play_count = detail_info.json()['total_play_count']
+        try:
+            detail_info = client.fetch(detail_url)
+            play_count = detail_info.json()['total_play_count']
+        except KeyError:
+            play_count = None
         increase_count = int(item['increaseCount'])
         rise, rise_text = int(item['rise']), ''
         if rise >= 3:
