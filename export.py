@@ -83,7 +83,7 @@ def export_data(date):
 
 def standardizing(play_count_text):
     if play_count_text is None:
-        return u'未获取到数据'
+        return 'unknown'
     last_idx = 0
     play_count = 0.0
     if u'亿' in play_count_text:
