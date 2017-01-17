@@ -5,6 +5,7 @@
 发送邮件'''
 
 import os
+import time
 import smtplib
 import mimetypes
 from email.mime.text import MIMEText
@@ -25,6 +26,7 @@ def mail_multipart(mail):
                 config.QQ_MAIL_PASSWORD)
             break
         except:
+            time.sleep(1)
             continue
     else:
         raise StandardError(u'登录邮箱失败')
