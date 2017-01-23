@@ -8,6 +8,7 @@ import os
 import time
 import smtplib
 import mimetypes
+from email.header import Header
 from email.mime.text import MIMEText
 from email.mime.base import MIMEBase
 from email.mime.multipart import MIMEMultipart
@@ -48,7 +49,7 @@ def mail_multipart(mail):
                     file_body.add_header(
                         'Content-Disposition',
                         'attachment',
-                        filename=file_name.encode('gb2312'))
+                        filename=str(Header(file_name, 'UTF-8')))
                     encode_base64(file_body)
                     multipart.attach(file_body)
             except IOError:
