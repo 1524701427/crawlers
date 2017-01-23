@@ -66,7 +66,8 @@ def mail_multipart(mail):
 
     for i in range(3):
         try:
-            server.sendmail(sender, ','.join(receipts), multipart.as_string())
+            server.sendmail(
+                sender, ','.join(receipts), multipart.as_string())
             break
         except:
             continue
