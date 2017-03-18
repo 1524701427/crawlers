@@ -12,18 +12,13 @@ from requests import exceptions
 
 class DataSync(object):
 
-    def __init__(self, func, pool):
-        assert hasattr(func, '__call__')
-        self.process = None
-        self.proxies_pool = pool
+    def __init__(self):
         self.q = Queue()
-        self.process = Process(target=func or self.run, args=(self.q,))
+        self.process = Process(target=self.run, args=(self, self.q))
         self.process.start()
 
     def sync(self):
-        proxies = self.q.get()
-        for proxy in proxies:
-            self.proxies_pool.pool.append(proxy)
+        return self.q.get()
 
     def run(self):
         raise NotImplementedError()
@@ -58,9 +53,9 @@ class Proxy(object):
 class ProxyPool(object):
 
     def __init__(
-            self, poolsize=30, sync=DataSync, **options):
+            self, poolsize=30, sync=None, **options):
         assert poolsize > 0
-        assert sync
+        assert sync and hasattr(sync, '__call__')
         self.poolsize = poolsize
         self.tries = options.get('tries', 3)
         self.sync = sync
@@ -79,7 +74,7 @@ class ProxyPool(object):
 
     def refresh(self):
         if self.sync is not None:
-            self.sync.sync()
+            self.pool.extend(self.sync.sync())
 
     def append(self, proxy, sort=False):
         self.pool.append(proxy)
