@@ -52,12 +52,12 @@ class Proxy(object):
 class ProxyPool(object):
 
     def __init__(
-            self, poolsize=30, sync=None, **options):
+            self, datasource, poolsize=30, **options):
         assert poolsize > 0
-        assert sync and hasattr(sync, '__call__')
+        assert datasource
         self.poolsize = poolsize
         self.tries = options.get('tries', 3)
-        self.sync = sync
+        self.datasource = datasource
         self.pool = []
 
     def peek(self):
@@ -72,8 +72,9 @@ class ProxyPool(object):
         self.pool.pop(0)
 
     def refresh(self):
-        if self.sync is not None:
-            self.pool.extend(self.sync.get(self.poolsize))
+        if self.datasource is not None:
+            self.pool = []
+            self.pool.extend(self.datasource.get(self.poolsize))
 
     def append(self, proxy, sort=False):
         self.pool.append(proxy)
