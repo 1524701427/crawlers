@@ -15,10 +15,6 @@ class DataSource(object):
     __metaclass__ = ABCMeta
 
     @abstractmethod
-    def __init__(self):
-        raise NotImplementedError()
-
-    @abstractmethod
     def get(self, count):
         raise NotImplementedError()
 
