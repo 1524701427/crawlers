@@ -19,7 +19,7 @@ class DataSource(object):
         raise NotImplementedError()
 
     @abstractmethod
-    def stream(self):
+    def get(self, count):
         raise NotImplementedError()
 
     @abstractmethod
@@ -77,7 +77,7 @@ class ProxyPool(object):
 
     def refresh(self):
         if self.sync is not None:
-            self.pool.extend(self.sync.sync())
+            self.pool.extend(self.sync.get(self.poolsize))
 
     def append(self, proxy, sort=False):
         self.pool.append(proxy)
