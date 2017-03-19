@@ -19,7 +19,7 @@ class DataSource(object):
         raise NotImplementedError()
 
     @abstractmethod
-    def run(self):
+    def stream(self, **options):
         raise NotImplementedError()
 
 
@@ -101,5 +101,4 @@ class ProxyPool(object):
 
 
 if __name__ == '__main__':
-    proxy = Proxy('121.40.42.35', 9999)
-    print proxy['host'], proxy['port']
+    pass
