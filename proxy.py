@@ -4,22 +4,25 @@ import sys
 import time
 import random
 import binascii
+from abc import ABCMeta, abstractmethod
 from functools import wraps
-from multiprocessing import Process, Queue
 
 from requests import exceptions
 
 
-class DataSync(object):
+class DataSource(object):
 
+    __metaclass__ = ABCMeta
+
+    @abstractmethod
     def __init__(self):
-        self.q = Queue()
-        self.process = Process(target=self.run, args=(self, self.q))
-        self.process.start()
+        raise NotImplementedError()
 
-    def sync(self):
-        return self.q.get()
+    @abstractmethod
+    def stream(self):
+        raise NotImplementedError()
 
+    @abstractmethod
     def run(self):
         raise NotImplementedError()
 
