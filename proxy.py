@@ -19,7 +19,7 @@ class DataSource(object):
         raise NotImplementedError()
 
     @abstractmethod
-    def stream(self, **options):
+    def stream(self):
         raise NotImplementedError()
 
 
@@ -27,7 +27,7 @@ class Proxy(object):
 
     def __init__(
             self, host, port,
-            schema='http', user=None, passwd=None, weight=0):
+            schema='http', user='', passwd='', weight=0):
         self.schema = schema
         self.host = host
         self.port = port
@@ -36,7 +36,9 @@ class Proxy(object):
         self.weight = weight
 
     def __hash__(self):
-        identifier = [self.schema, self.host, str(self.port)]
+        identifier = filter(
+            None,
+            [self.schema, self.host, str(self.port), self.user, self.passwd])
         identifier = ','.join(identifier)
         return binascii.crc32(identifier)
 
@@ -53,7 +55,6 @@ class ProxyPool(object):
 
     def __init__(
             self, datasource, poolsize=30, **options):
-        assert poolsize > 0
         assert datasource
         self.poolsize = poolsize
         self.tries = options.get('tries', 3)
