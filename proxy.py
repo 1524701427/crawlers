@@ -100,12 +100,14 @@ class ProxyPool(object):
                     params['proxy'] = host = self.peek()
                     params.update(kwargs)
                     res = func(*args, **params)
+                    break
                 except (exceptions.ConnectTimeout, exceptions.ConnectionError):
                     sys.stderr.write('retry...\n')
-                    self.remove(host)
                     time.sleep(0.5)
                     continue
-                return res
+            else:
+                self.pool.remove(host)
+            return res
         return wrapper
 
 
