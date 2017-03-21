@@ -4,8 +4,9 @@ import sys
 import time
 import random
 import binascii
-from abc import ABCMeta, abstractmethod
 from functools import wraps
+from collections import deque
+from abc import ABCMeta, abstractmethod
 
 from requests import exceptions
 
@@ -47,6 +48,12 @@ class Proxy(object):
             self.__class__.__name__, id(self),
         )
 
+    def __str__(self):
+        auth_part = ''
+        if self.user and self.passwd:
+            auth_part = '%s@%s:' % (self.user, self.passwd)
+        return '%s://%s%s:%d' % (self.schema, auth_part, self.host, self.port)
+
     def __getitem__(self, key):
         return self.__getattribute__(key)
 
@@ -59,7 +66,7 @@ class ProxyPool(object):
         self.poolsize = poolsize
         self.tries = options.get('tries', 3)
         self.datasource = datasource
-        self.pool = []
+        self.pool = deque()
 
     def peek(self):
         if not self.pool:
@@ -70,11 +77,11 @@ class ProxyPool(object):
         self.pool.remove(item)
 
     def pop(self):
-        self.pool.pop(0)
+        self.pool.popleft()
 
     def refresh(self):
         if self.datasource is not None:
-            self.pool = []
+            self.pool = deque()
             self.pool.extend(self.datasource.get(self.poolsize))
 
     def append(self, proxy, sort=False):
