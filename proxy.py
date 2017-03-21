@@ -23,6 +23,13 @@ class DataSource(object):
     def stream(self):
         raise NotImplementedError()
 
+    def __iter__(self):
+        return self
+
+    @abstractmethod
+    def __next__(self):
+        raise StopIteration()
+
 
 class Proxy(object):
 
