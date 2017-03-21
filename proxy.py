@@ -51,7 +51,7 @@ class Proxy(object):
     def __str__(self):
         auth_part = ''
         if self.user and self.passwd:
-            auth_part = '%s@%s:' % (self.user, self.passwd)
+            auth_part = '%s:%s@' % (self.user, self.passwd)
         return '%s://%s%s:%d' % (self.schema, auth_part, self.host, self.port)
 
     def __getitem__(self, key):
