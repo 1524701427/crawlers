@@ -94,6 +94,7 @@ class ProxyPool(object):
     def proxy(self, func):
         @wraps(func)
         def wrapper(*args, **kwargs):
+            res = None
             for i in range(self.tries):
                 try:
                     params = dict()
