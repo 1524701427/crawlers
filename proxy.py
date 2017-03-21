@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 
-import sys
 import time
 import random
 import binascii
@@ -75,6 +74,11 @@ class ProxyPool(object):
         self.datasource = datasource
         self.pool = deque()
 
+    def _sort(self, reverse=True):
+        self.pool.sort(
+            key=lambda o: o.weight, reverse=reverse,
+        )
+
     def peek(self):
         if not self.pool:
             raise IndexError()
@@ -88,15 +92,17 @@ class ProxyPool(object):
 
     def refresh(self):
         if self.datasource is not None:
+            stream = self.datasource.stream()
             self.pool = deque()
-            self.pool.extend(self.datasource.get(self.poolsize))
+            for i in xrange(self.poolsize):
+                proxy = next(stream)
+                self.pool.append(proxy)
+            self._sort
 
     def append(self, proxy, sort=False):
         self.pool.append(proxy)
         if sort is True:
-            self.pool.sort(
-                key=lambda o: o.weight, reverse=True,
-            )
+            self._sort()
 
     def proxy(self, func):
         @wraps(func)
@@ -110,7 +116,6 @@ class ProxyPool(object):
                     res = func(*args, **params)
                     break
                 except (exceptions.ConnectTimeout, exceptions.ConnectionError):
-                    sys.stderr.write('retry...\n')
                     time.sleep(0.5)
                     continue
             else:
