@@ -55,9 +55,13 @@ def mail_multipart(mail):
             except IOError:
                 continue
     if 'text' in mail:
-        text = mail['text']
+        text = mail['text']  # utf-8 charset limited.
         text = MIMEText(text, 'plain', 'utf-8')
         multipart.attach(text)
+    if 'html' in mail:
+        html = mail['html']
+        html = MIMEText(html, 'html', 'utf-8')
+        multipart.attach(html)
     receipts = mail['to']
     sender = mail.get('from', config.QQ_MAIL_ACCOUNT)
     multipart['From'] = sender
