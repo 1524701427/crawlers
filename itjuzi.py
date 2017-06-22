@@ -68,7 +68,7 @@ def export(projects):
         sheet.cell(row=row, column=5, value=project['abstract'])
 
     email = dict()
-    email['to'] = ['avrilliu@lighthousecap.cn']
+    email['to'] = ['wanglanwei@lighthousecap.cn']
     email['subject'] = subject
     email['attachment'] = [u'%s.xlsx' % subject]
     mail_multipart(email)
@@ -78,7 +78,7 @@ def get_last_id():
     '''获取上次爬取的截止id'''
     try:
         with open('last_id', 'rt') as f:
-            last_id = f.readline(1)
+            last_id = f.read()
             last_id = int(last_id.strip())
     except IOError:
         last_id = input('please specified the last_id? ')
@@ -168,7 +168,9 @@ def crawler():
         time.sleep(3)
     last_id = projects[0]['id']
     set_last_id(last_id)
+    return projects
 
 
 if __name__ == '__main__':
-    crawler()
+    projects = crawler()
+    export(projects)
