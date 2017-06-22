@@ -82,6 +82,7 @@ def crawler():
 
                 project = dict()
                 project['url'] = tag_is[0].a['href']
+                print(project['url'])
                 project['name'] = tag_li.p.a.string
                 project['industry'] = tag_spans[2].a.string
                 
@@ -91,14 +92,14 @@ def crawler():
 
                 detail_soup = BeautifulSoup(detail_resp.text, 'lxml')
                 location = detail_soup.select('span[class="loca c-gray-aset"]')[0]
-                project['location'] = [x for x in location.strings][0]
+                project['location'] = location.a.string.strip()
 
                 div_link_line = detail_soup.select('div[class="link-line"]')[0]
                 project['web'] = ''
                 web_links = div_link_line.select('a[target="_blank"]')
                 for web_link in web_links:
                     if web_link['href']:
-                        project['web'] = web_link['href']
+                        project['web'] = web_link['href'].strip()
                         break
 
                 project['abstract'] = detail_soup.find(attrs={"name": "Description"})['content']
