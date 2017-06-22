@@ -35,12 +35,12 @@ class HttpClient(object):
             self.s.headers.update(headers)
 
     def get(self, url):
-        for i in range(self.tries):
+        for i in range(1, self.tries+1):
             try:
                 resp = self.s.get(url)
                 break
             except:
-                time.sleep(self.try_internal*(i+1))
+                time.sleep(self.try_internal*i)
                 continue
         else:
             raise RuntimeError("bad network...")
