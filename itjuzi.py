@@ -76,9 +76,14 @@ def export(projects):
 
 def get_last_id():
     '''获取上次爬取的截止id'''
-    with open('last_id', 'rt') as f:
-        last_id = f.readline(1)
-        last_id = int(last_id.strip())
+    try:
+        with open('last_id', 'rt') as f:
+            last_id = f.readline(1)
+            last_id = int(last_id.strip())
+    except IOError:
+        last_id = input('please specified the last_id? ')
+        assert last_id > 0
+    finally:
         return last_id
 
 
