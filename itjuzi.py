@@ -47,13 +47,7 @@ class HttpClient(object):
         return resp
 
 
-def crawler():
-    '''it桔子爬虫'''
-    client = HttpClient(headers)
-    init_page = page = 0
-    delimiters = '>'*30
-    url_tpl = (
-        'http://www.itjuzi.com/company?sortby=inputtime&page=%(page)d')
+def export(projects):
     subject = u'%s 日it桔子项目汇总' % date.today() 
     workbook = openpyxl.Workbook()
     sheet = workbook.active
@@ -63,12 +57,52 @@ def crawler():
     ]
     for i, header in enumerate(xls_headers, 1):
         sheet.cell(row=1, column=i, value=header)
+
     row = 1
-    while True:
+    for project in projects:
+        row += 1
+        sheet.cell(row=row, column=1, value=project['name'])
+        sheet.cell(row=row, column=2, value=project['location'])
+        sheet.cell(row=row, column=3, value=project['industry'])
+        sheet.cell(row=row, column=4, value=project['web'])
+        sheet.cell(row=row, column=5, value=project['abstract'])
+
+    email = dict()
+    email['to'] = ['avrilliu@lighthousecap.cn']
+    email['subject'] = subject
+    email['attachment'] = [u'%s.xlsx' % subject]
+    mail_multipart(email)
+
+
+def get_last_id():
+    '''获取上次爬取的截止id'''
+    with open('last_id', 'rt') as f:
+        last_id = f.readline(1)
+        last_id = int(last_id.strip())
+        return last_id
+
+
+def set_last_id(last_id):
+    '''设置上次爬去的截止id'''
+    with open('last_id', 'wt') as f:
+        f.write('%d\n' % last_id)
+        return last_id
+
+
+def crawler():
+    '''it桔子爬虫'''
+    client = HttpClient(headers)
+    last_id = get_last_id()
+    init_page = page = 0
+    delimiters = '>'*10
+    url_tpl = (
+        'http://www.itjuzi.com/company?sortby=inputtime&page=%(page)d')
+    quit = False
+    projects = []
+    while quit is False:
         page += 1
         url = url_tpl % dict(page=page)
         print(delimiters, url)
-        projects = []
         resp = client.get(url)
         if resp is not None:
             soup = BeautifulSoup(resp.text, 'lxml')
@@ -83,6 +117,12 @@ def crawler():
                 project = dict()
                 project['url'] = tag_is[0].a['href']
                 print(project['url'])
+
+                project_id = int(project['url'].split('/')[-1])
+                if project_id <= last_id:
+                    quit = True
+                    break
+
                 project['name'] = tag_li.p.a.string
                 project['industry'] = tag_spans[2].a.string
                 
@@ -118,23 +158,7 @@ def crawler():
                         financings.append(financing)
                 project['financings'] = financings
                 projects.append(project)
-        for project in projects:
-            row += 1
-            sheet.cell(row=row, column=1, value=project['name'])
-            sheet.cell(row=row, column=2, value=project['location'])
-            sheet.cell(row=row, column=3, value=project['industry'])
-            sheet.cell(row=row, column=4, value=project['web'])
-            sheet.cell(row=row, column=5, value=project['abstract'])
-        if page - init_page >= 3:
-            workbook.save(u'%s.xlsx' % subject)
-            break
         time.sleep(3)
-
-    email = dict()
-    email['to'] = ['avrilliu@lighthousecap.cn']
-    email['subject'] = subject
-    email['attachment'] = [u'%s.xlsx' % subject]
-    mail_multipart(email)
 
 
 if __name__ == '__main__':
