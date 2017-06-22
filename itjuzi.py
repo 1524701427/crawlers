@@ -116,7 +116,6 @@ def crawler():
                         financing['investors'] = [x for x in tds[3].strings if x != '\n']
                         financings.append(financing)
                 project['financings'] = financings
-                print(project)
                 projects.append(project)
         for project in projects:
             row += 1
@@ -133,7 +132,7 @@ def crawler():
     email = dict()
     email['to'] = ['avrilliu@lighthousecap.cn']
     email['subject'] = subject
-    email['attachment'] = u'%s.xlsx' % subject
+    email['attachment'] = [u'%s.xlsx' % subject]
     mail_multipart(email)
 
 
