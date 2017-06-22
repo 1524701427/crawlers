@@ -91,7 +91,7 @@ def crawler():
 
                 detail_soup = BeautifulSoup(detail_resp.text, 'lxml')
                 location = detail_soup.select('span[class="loca c-gray-aset"]')[0]
-                project['location'] = ''.join([x for x in location.strings])
+                project['location'] = [x for x in location.strings][0]
 
                 div_link_line = detail_soup.select('div[class="link-line"]')[0]
                 project['web'] = ''
