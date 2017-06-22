@@ -7,10 +7,13 @@
 from __future__ import print_function
 
 import time
+from datetime import date
 
 import requests
 import openpyxl
 from bs4 import BeautifulSoup
+
+from mail import mail_multipart
 
 headers = {
     'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
@@ -23,8 +26,10 @@ DEBUG = False
 
 class HttpClient(object):
 
-    def __init__(self, headers=None, tries=5):
+    def __init__(self, default_headers=None, tries=3, try_internal=0.5):
+        assert 1<= tries <= 5
         self.tries = tries
+        self.try_internal = 0.5
         self.s = requests.Session()
         if headers is not None:
             self.s.headers.update(headers)
@@ -35,19 +40,21 @@ class HttpClient(object):
                 resp = self.s.get(url)
                 break
             except:
+                time.sleep(self.try_internal*(i+1))
                 continue
         else:
-            raise RuntimeError()
+            raise RuntimeError("bad network...")
         return resp
 
 
 def crawler():
     '''it桔子爬虫'''
     client = HttpClient(headers)
-    init_page = page = 7
+    init_page = page = 0
     delimiters = '>'*30
     url_tpl = (
         'http://www.itjuzi.com/company?sortby=inputtime&page=%(page)d')
+    subject = u'%s 日it桔子项目汇总' % date.today() 
     workbook = openpyxl.Workbook()
     sheet = workbook.active
     sheet.title = u'IT桔子'
@@ -81,20 +88,21 @@ def crawler():
                 time.sleep(1)
                 detail_url = project['url']
                 detail_resp = client.get(detail_url)
-                if detail_resp is None:
-                    raise RuntimeError("bad network...")
 
                 detail_soup = BeautifulSoup(detail_resp.text, 'lxml')
                 location = detail_soup.select('span[class="loca c-gray-aset"]')[0]
                 project['location'] = ''.join([x for x in location.strings])
+
                 div_link_line = detail_soup.select('div[class="link-line"]')[0]
                 project['web'] = ''
                 web_links = div_link_line.select('a[target="_blank"]')
                 for web_link in web_links:
                     if web_link['href']:
                         project['web'] = web_link['href']
+                        break
+
                 project['abstract'] = detail_soup.find(attrs={"name": "Description"})['content']
-                # 融资情况
+
                 financings = []
                 tables = detail_soup.select('table[class="list-round-v2"]')
                 if tables:
@@ -118,9 +126,15 @@ def crawler():
             sheet.cell(row=row, column=4, value=project['web'])
             sheet.cell(row=row, column=5, value=project['abstract'])
         if page - init_page >= 3:
-            workbook.save(u'IT桔子数据.xlsx')
+            workbook.save(u'%s.xlsx' % subject)
             break
         time.sleep(3)
+
+    email = dict()
+    email['to'] = ['avrilliu@lighthousecap.cn']
+    email['subject'] = subject
+    email['attachment'] = u'%s.xlsx' % subject
+    mail_multipart(email)
 
 
 if __name__ == '__main__':
