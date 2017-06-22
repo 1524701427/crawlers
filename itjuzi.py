@@ -98,6 +98,7 @@ def crawler():
     '''it桔子爬虫'''
     client = HttpClient(headers)
     last_id = get_last_id()
+    print(last_id)
     init_page = page = 0
     delimiters = '>'*10
     url_tpl = (
@@ -124,6 +125,7 @@ def crawler():
                 print(project['url'])
 
                 project_id = int(project['url'].split('/')[-1])
+                project['id'] = project_id
                 if project_id <= last_id:
                     quit = True
                     break
@@ -164,6 +166,8 @@ def crawler():
                 project['financings'] = financings
                 projects.append(project)
         time.sleep(3)
+    last_id = projects[0]['id']
+    set_last_id(last_id)
 
 
 if __name__ == '__main__':
