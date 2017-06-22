@@ -1,3 +1,6 @@
 xlwt
 requests
 gevent
+openpyxl
+lxml
+beautifulsoup4
