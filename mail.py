@@ -18,7 +18,7 @@ import config
 
 
 def mail_multipart(mail, **kwargs):
-    mail.update(kwargs)  # enable key words arguments support.
+    # mail.update(kwargs)  # enable key words arguments support.
 
     server = smtplib.SMTP_SSL()
     for i in range(5):

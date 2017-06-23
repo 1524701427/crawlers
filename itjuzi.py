@@ -66,6 +66,7 @@ def export(projects):
         sheet.cell(row=row, column=3, value=project['industry'])
         sheet.cell(row=row, column=4, value=project['web'])
         sheet.cell(row=row, column=5, value=project['abstract'])
+    workbook.save(u'%s.xlsx' % subject)
 
     email = dict()
     email['to'] = ['wanglanwei@lighthousecap.cn']
