@@ -29,7 +29,7 @@ class HttpClient(object):
     def __init__(self, default_headers=None, tries=3, try_internal=0.5):
         assert 1<= tries <= 5
         self.tries = tries
-        self.try_internal = 0.5
+        self.try_internal = 3
         self.s = requests.Session()
         if headers is not None:
             self.s.headers.update(headers)
@@ -98,8 +98,8 @@ def set_last_id(last_id):
 def crawler():
     '''it桔子爬虫'''
     client = HttpClient(headers)
-    last_id = get_last_id()
-    print(last_id)
+    # last_id = get_last_id()
+    # print(last_id)
     init_page = page = 0
     delimiters = '>'*10
     url_tpl = (
@@ -127,9 +127,9 @@ def crawler():
 
                 project_id = int(project['url'].split('/')[-1])
                 project['id'] = project_id
-                if project_id <= last_id:
-                    quit = True
-                    break
+                #  if project_id <= last_id:
+                #      quit = True
+                #      break
 
                 project['name'] = tag_li.p.a.string
                 project['industry'] = tag_spans[2].a.string
@@ -139,8 +139,10 @@ def crawler():
                 detail_resp = client.get(detail_url)
 
                 detail_soup = BeautifulSoup(detail_resp.text, 'lxml')
-                location = detail_soup.select('span[class="loca c-gray-aset"]')[0]
-                project['location'] = location.a.string.strip()
+                project['location'] = ''
+                locations = detail_soup.select('span[class="loca c-gray-aset"]')
+                if locations:
+                    project['location'] = location.a.string.strip()
 
                 div_link_line = detail_soup.select('div[class="link-line"]')[0]
                 project['web'] = ''
@@ -166,9 +168,11 @@ def crawler():
                         financings.append(financing)
                 project['financings'] = financings
                 projects.append(project)
-        time.sleep(3)
-    last_id = projects[0]['id']
-    set_last_id(last_id)
+        time.sleep(5)
+        if page - init_page >= 20:
+            break
+    # last_id = projects[0]['id']
+    # set_last_id(last_id)
     return projects
 
 
