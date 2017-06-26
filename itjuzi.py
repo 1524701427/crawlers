@@ -134,7 +134,7 @@ def crawler():
                 project['name'] = tag_li.p.a.string
                 project['industry'] = tag_spans[2].a.string
                 
-                time.sleep(1)
+                time.sleep(3)
                 detail_url = project['url']
                 detail_resp = client.get(detail_url)
 
