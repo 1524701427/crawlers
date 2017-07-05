@@ -12,6 +12,7 @@ from datetime import date
 
 import requests
 import openpyxl
+from openpyxl.styles import Font, Border, Side, NamedStyle, Alignment
 from bs4 import BeautifulSoup
 
 import config
@@ -83,7 +84,8 @@ def export(projects):
         sheet.cell(row=row, column=1, value=project['name'])
         sheet.cell(row=row, column=2, value=project['location'])
         sheet.cell(row=row, column=3, value=project['industry'])
-        sheet.cell(row=row, column=4, value=project['web'])
+        cell = sheet.cell(row=row, column=4, value=project['web'])
+        cell.style = 'Hyperlink'  # builtin样式，超链接样式
         sheet.cell(row=row, column=5, value=project['abstract'])
     workbook.save(u'%s.xlsx' % subject)
 
