@@ -101,6 +101,15 @@ def export(projects):
         cell = sheet.cell(row=row, column=5, value=project['abstract'])
         cell.font = font
         cell.alignment = Alignment(wrap_text=True)
+    # 自动调整列宽
+    dims = dict()
+	dims = {}
+	for row in sheet.rows:
+		for cell in row:
+			if cell.value:
+				dims[cell.column] = max((dims.get(cell.column, 0), len(cell.value)))
+	for col, value in dims.items():
+		ws.column_dimensions[col].width = value + 2
     # 设置列宽
     sheet.column_dimensions['E'].width = 60
     workbook.save(u'%s.xlsx' % subject)
