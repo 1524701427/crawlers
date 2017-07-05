@@ -100,7 +100,7 @@ def export(projects):
     workbook.save(u'%s.xlsx' % subject)
 
     email = dict()
-    email['to'] = ['wanglanwei@lighthousecap.cn']
+    email['to'] = ['wanglanwei@weiche.cn']
     email['subject'] = subject
     email['attachment'] = [u'%s.xlsx' % subject]
     mail_multipart(email)
