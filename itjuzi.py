@@ -49,6 +49,7 @@ class HttpClient(object):
         return resp
 
     def login(self, user, password):
+        # 建议抽象化为基类，以后使用，增加验证码识别模块
         url = 'https://www.itjuzi.com/user/login?redirect=&flag='
         content_type = 'application/x-www-form-urlencoded'
         data = {
@@ -100,7 +101,9 @@ def get_last_id():
             last_id = f.read()
             last_id = int(last_id.strip())
     except IOError:
-        last_id = input('please specified the last_id? ')
+        last_id = 67960
+        with open('last_id', 'wt') as f:
+            f.write(str(last_id))
         assert last_id > 0
     finally:
         return last_id
@@ -118,7 +121,6 @@ def crawler(user, password):
     client = HttpClient(headers)
     client.login(user, password)
     # last_id = get_last_id()
-    # print(last_id)
     init_page = page = 20
     delimiters = '>'*10
     url_tpl = (
@@ -145,9 +147,11 @@ def crawler(user, password):
 
                 project_id = int(project['url'].split('/')[-1])
                 project['id'] = project_id
-                #  if project_id <= last_id:
-                #      quit = True
-                #      break
+
+                # 运行到截止id退出
+                if project_id <= last_id:
+                    quit = True
+                    break
 
                 project['name'] = tag_li.p.a.string
                 project['industry'] = tag_spans[2].a.string
@@ -189,8 +193,8 @@ def crawler(user, password):
         time.sleep(5)
         if page - init_page >= 10:
             break
-    # last_id = projects[0]['id']
-    # set_last_id(last_id)
+    last_id = projects[0]['id']
+    set_last_id(last_id)
     return projects
 
 
