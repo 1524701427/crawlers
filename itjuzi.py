@@ -219,8 +219,9 @@ def crawler(user, password):
                 project['financings'] = financings
                 projects.append(project)
         time.sleep(5)
-        #  if page - init_page >= 10:
-        #      break
+        # itjuzi最多可以爬50页数据
+        if page - init_page >= 50:
+            break
     last_id = projects[0]['id']
     set_last_id(last_id)
     return projects
