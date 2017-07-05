@@ -30,7 +30,7 @@ DEBUG = False
 class HttpClient(object):
 
     def __init__(self, default_headers=None, tries=3, try_internal=0.5):
-        assert 1<= tries <= 5
+        assert 1 <= tries <= 5
         self.tries = tries
         self.try_internal = 3
         self.s = requests.Session()
@@ -68,7 +68,7 @@ class HttpClient(object):
 
 
 def export(projects):
-    subject = u'%s 日it桔子项目汇总' % date.today() 
+    subject = u'%s 日it桔子项目汇总' % date.today()
     workbook = openpyxl.Workbook()
     sheet = workbook.active
     sheet.title = u'IT桔子'
@@ -103,13 +103,13 @@ def export(projects):
         cell.alignment = Alignment(wrap_text=True)
     # 自动调整列宽
     dims = dict()
-	dims = {}
-	for row in sheet.rows:
-		for cell in row:
-			if cell.value:
-				dims[cell.column] = max((dims.get(cell.column, 0), len(cell.value)))
-	for col, value in dims.items():
-		ws.column_dimensions[col].width = value + 2
+    for row in sheet.rows:
+        for cell in row:
+            if cell.value:
+                dims[cell.column] = \
+                    max((dims.get(cell.column, 0), len(cell.value)))
+    for col, value in dims.items():
+        sheet.column_dimensions[col].width = value + 2
     # 设置列宽
     sheet.column_dimensions['E'].width = 60
     workbook.save(u'%s.xlsx' % subject)
@@ -183,7 +183,7 @@ def crawler(user, password):
 
                 project['name'] = tag_li.p.a.string
                 project['industry'] = tag_spans[2].a.string
-                
+
                 time.sleep(5)
                 detail_url = project['url']
                 detail_resp = client.get(detail_url)
