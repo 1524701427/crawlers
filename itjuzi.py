@@ -6,6 +6,7 @@
 
 from __future__ import print_function
 
+import sys
 import time
 from datetime import date
 
@@ -13,6 +14,7 @@ import requests
 import openpyxl
 from bs4 import BeautifulSoup
 
+import config
 from mail import mail_multipart
 
 headers = {
@@ -21,7 +23,7 @@ headers = {
     'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36',
 }
 
-DEBUG = False
+DEBUG = True
 
 
 class HttpClient(object):
@@ -45,6 +47,22 @@ class HttpClient(object):
         else:
             raise RuntimeError("bad network...")
         return resp
+
+    def login(self, user, password):
+        url = 'https://www.itjuzi.com/user/login?redirect=&flag='
+        content_type = 'application/x-www-form-urlencoded'
+        data = {
+            'identity': user,
+            'password': password,
+            'remember': 1,
+            'page': None,
+            'url': None,
+        }
+        resp = self.s.post(url, data=data, headers={'Content-Type': content_type})
+        print(resp)
+        if resp is not None:
+            for c in resp.cookies:
+                print('>', c.name, '=', c.value)
 
 
 def export(projects):
@@ -95,12 +113,13 @@ def set_last_id(last_id):
         return last_id
 
 
-def crawler():
+def crawler(user, password):
     '''it桔子爬虫'''
     client = HttpClient(headers)
+    client.login(user, password)
     # last_id = get_last_id()
     # print(last_id)
-    init_page = page = 0
+    init_page = page = 20
     delimiters = '>'*10
     url_tpl = (
         'http://www.itjuzi.com/company?sortby=inputtime&page=%(page)d')
@@ -113,8 +132,7 @@ def crawler():
         resp = client.get(url)
         if resp is not None:
             soup = BeautifulSoup(resp.text, 'lxml')
-            if DEBUG is True:
-                print(soup.prettify())
+            print(soup)
 
             tag_ul = soup.select('ul[class="list-main-icnset list-main-com"]')[0]
             for idx, tag_li in enumerate(tag_ul.find_all('li')):
@@ -134,7 +152,7 @@ def crawler():
                 project['name'] = tag_li.p.a.string
                 project['industry'] = tag_spans[2].a.string
                 
-                time.sleep(3)
+                time.sleep(5)
                 detail_url = project['url']
                 detail_resp = client.get(detail_url)
 
@@ -142,7 +160,7 @@ def crawler():
                 project['location'] = ''
                 locations = detail_soup.select('span[class="loca c-gray-aset"]')
                 if locations:
-                    project['location'] = location.a.string.strip()
+                    project['location'] = locations[0].a.string.strip()
 
                 div_link_line = detail_soup.select('div[class="link-line"]')[0]
                 project['web'] = ''
@@ -169,7 +187,7 @@ def crawler():
                 project['financings'] = financings
                 projects.append(project)
         time.sleep(5)
-        if page - init_page >= 20:
+        if page - init_page >= 10:
             break
     # last_id = projects[0]['id']
     # set_last_id(last_id)
@@ -177,5 +195,5 @@ def crawler():
 
 
 if __name__ == '__main__':
-    projects = crawler()
+    projects = crawler(config.ITJUZI_USER, config.ITJUZI_PASSWORD)
     export(projects)
