@@ -24,7 +24,7 @@ headers = {
     'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36',
 }
 
-DEBUG = True
+DEBUG = False
 
 
 class HttpClient(object):
@@ -133,7 +133,7 @@ def crawler(user, password):
     client = HttpClient(headers)
     client.login(user, password)
     last_id = get_last_id()
-    #  init_page = page = 0
+    init_page = page = 0
     delimiters = '>'*10
     url_tpl = (
         'http://www.itjuzi.com/company?sortby=inputtime&page=%(page)d')
@@ -146,7 +146,8 @@ def crawler(user, password):
         resp = client.get(url)
         if resp is not None:
             soup = BeautifulSoup(resp.text, 'lxml')
-            print(soup)
+            if DEBUG is True:
+                print(soup)
 
             tag_ul = soup.select('ul[class="list-main-icnset list-main-com"]')[0]
             for idx, tag_li in enumerate(tag_ul.find_all('li')):
