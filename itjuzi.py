@@ -75,7 +75,11 @@ def export(projects):
     # 设置字体
     font = Font(name=u'楷体', size=10)
     # 设置对齐方式
-    alignment = Alignment(wrap_text=True)
+    alignment = Alignment(vertical='center', wrap_text=True)
+    # 自定义样式
+    stdstyle = NamedStyle(name=u'标准样式')
+    stdstyle.font = font
+    stdstyle.alignment = alignment
     xls_headers = [
         u'项目名称', u'地址',  u'细分领域', u'项目连接', u'项目简介', u'融资情况'
     ]
@@ -86,13 +90,14 @@ def export(projects):
     for project in projects:
         row += 1
         cell = sheet.cell(row=row, column=1, value=project['name'])
-        cell.font = font
+        cell.style = stdstyle
         cell = sheet.cell(row=row, column=2, value=project['location'])
-        cell.font = font
+        cell.style = stdstyle
         cell = sheet.cell(row=row, column=3, value=project['industry'])
-        cell.font = font
+        cell.style = stdstyle
         cell = sheet.cell(row=row, column=4, value=project['web'])
         cell.style = 'Hyperlink'  # builtin样式，超链接样式
+        cell.alignment = alignment
         cell = sheet.cell(row=row, column=5, value=project['abstract'])
         cell.font = font
         cell.alignment = alignment
