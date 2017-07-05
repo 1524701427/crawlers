@@ -101,6 +101,8 @@ def export(projects):
         cell = sheet.cell(row=row, column=5, value=project['abstract'])
         cell.font = font
         cell.alignment = Alignment(wrap_text=True)
+        cell = sheet.cell(row=row, column=6, value=project['investing'])
+        cell.style = stdstyle
     # 自动调整列宽
     dims = dict()
     for row in sheet.rows:
@@ -193,6 +195,12 @@ def crawler(user, password):
                 locations = detail_soup.select('span[class="loca c-gray-aset"]')
                 if locations:
                     project['location'] = locations[0].a.string.strip()
+
+                # 项目状态
+                project['investing'] = ''
+                title_blocks = detail_soup.select('span[class="t-small c-green"]')
+                if title_blocks:
+                    project['investing'] = title_blocks[0].string.strip()
 
                 div_link_line = detail_soup.select('div[class="link-line"]')[0]
                 project['web'] = ''
