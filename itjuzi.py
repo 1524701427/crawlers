@@ -132,8 +132,8 @@ def crawler(user, password):
     '''it桔子爬虫'''
     client = HttpClient(headers)
     client.login(user, password)
-    # last_id = get_last_id()
-    init_page = page = 20
+    last_id = get_last_id()
+    #  init_page = page = 0
     delimiters = '>'*10
     url_tpl = (
         'http://www.itjuzi.com/company?sortby=inputtime&page=%(page)d')
@@ -203,8 +203,8 @@ def crawler(user, password):
                 project['financings'] = financings
                 projects.append(project)
         time.sleep(5)
-        if page - init_page >= 10:
-            break
+        #  if page - init_page >= 10:
+        #      break
     last_id = projects[0]['id']
     set_last_id(last_id)
     return projects
