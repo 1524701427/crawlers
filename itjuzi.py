@@ -102,7 +102,7 @@ def export(projects):
         cell.font = font
         cell.alignment = alignment
     # 设置列宽
-    sheet.column_dimensions['F'].width = 60
+    sheet.column_dimensions['F'].width = 560
     workbook.save(u'%s.xlsx' % subject)
 
     email = dict()
