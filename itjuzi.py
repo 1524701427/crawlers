@@ -100,9 +100,9 @@ def export(projects):
         cell.alignment = alignment
         cell = sheet.cell(row=row, column=5, value=project['abstract'])
         cell.font = font
-        cell.alignment = alignment
+        cell.alignment = Alignment(wrap_text=True)
     # 设置列宽
-    sheet.column_dimensions['F'].width = 560
+    sheet.column_dimensions['E'].width = 60
     workbook.save(u'%s.xlsx' % subject)
 
     email = dict()
