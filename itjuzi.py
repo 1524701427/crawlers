@@ -94,9 +94,10 @@ def export(projects):
         cell = sheet.cell(row=row, column=4, value=project['web'])
         cell.style = 'Hyperlink'  # builtin样式，超链接样式
         cell = sheet.cell(row=row, column=5, value=project['abstract'])
-        cell.width = 60
         cell.font = font
         cell.alignment = alignment
+    # 设置列宽
+    sheet.column_dimensions['F'].width = 60
     workbook.save(u'%s.xlsx' % subject)
 
     email = dict()
