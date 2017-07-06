@@ -200,7 +200,8 @@ def crawler(user, password):
                 project['investing'] = ''
                 title_blocks = detail_soup.select('span[class="t-small c-green"]')
                 if title_blocks:
-                    project['investing'] = title_blocks[0].string.strip()
+                    # 去除掉两边的"(", ")"
+                    project['investing'] = title_blocks[0].string.strip()[1:-1]
 
                 div_link_line = detail_soup.select('div[class="link-line"]')[0]
                 project['web'] = ''
