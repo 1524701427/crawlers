@@ -50,6 +50,9 @@ class CrawlerHttpClient(object):
         self._rate_limit = rate_limit
         self._allow_redirects = allow_redirects
 
+        self._last_active_time = int(time.time())
+        self._count = 0
+
         self._s = requests.Session()
         self._s.max_redirects = 10  # 最大允许10次重定向
 
@@ -83,6 +86,7 @@ class CrawlerHttpClient(object):
                 )
                 break
             except (ConnectionError, Timeout):
+                self._count += 1
                 sleep((i+1)*self._try_internal)
                 continue
             except (HTTPError, TooManyRedirects):
