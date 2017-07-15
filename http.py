@@ -53,11 +53,11 @@ class CrawlerHttpClient(object):
         self._last_active_time = int(time.time())
         self._count = 0
 
-        self._s = requests.Session()
-        self._s.max_redirects = 10  # 最大允许10次重定向
+        self.s = requests.Session()
+        self.s.max_redirects = 10  # 最大允许10次重定向
 
         if default_headers is not None:
-            self._s.headers.update(default_headers)
+            self.s.headers.update(default_headers)
 
     def get(self, url, data=None, timeout=None):
         '''
@@ -79,7 +79,7 @@ class CrawlerHttpClient(object):
 
         for i in range(self._tries):
             try:
-                resp = self._s.get(
+                resp = self.s.get(
                     url,
                     timeout=timeout,
                     allow_redirects=self._allow_redirects,
@@ -94,6 +94,28 @@ class CrawlerHttpClient(object):
         else:
             raise RuntimeError('Bad network...')
         return resp
+
+    def before_request(self):
+        '''
+        Hook函数，每次HTTP请求前被调用。
+
+        Args:
+            None
+
+        Returns:
+            None
+        '''
+
+    def after_request(self):
+        '''
+        Hook函数，每次HTTP请求后备调用。
+
+        Args:
+            None
+
+        Returns:
+            None
+        '''
 
     def __call__(self, *args, **kwargs):
         return self.get(*args, **kwargs)
