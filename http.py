@@ -160,7 +160,4 @@ class CrawlerHttpClient(object):
 
 
 if __name__ == '__main__':
-    httpclient = CrawlerHttpClient()
-    resp = httpclient('http://www.weiche.cn')
-    if resp is not None:
-        print(resp.text)
+    pass
