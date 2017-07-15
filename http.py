@@ -53,11 +53,11 @@ class CrawlerHttpClient(object):
         self._last_active_time = int(time.time())
         self._count = 0
 
-        self.s = requests.Session()
-        self.s.max_redirects = 10  # 最大允许10次重定向
+        self._s = requests.Session()
+        self._s.max_redirects = 10  # 最大允许10次重定向
 
         if default_headers is not None:
-            self.s.headers.update(default_headers)
+            self._s.headers.update(default_headers)
 
     def get(self, url, data=None, timeout=None):
         '''
@@ -77,9 +77,11 @@ class CrawlerHttpClient(object):
         if data is not None:
             url = url + urllib.urlencode(data)
 
+        self.before_request(self._s)
+
         for i in range(self._tries):
             try:
-                resp = self.s.get(
+                resp = self._s.get(
                     url,
                     timeout=timeout,
                     allow_redirects=self._allow_redirects,
@@ -93,25 +95,28 @@ class CrawlerHttpClient(object):
                 raise RuntimeError('Unavaliable url...')
         else:
             raise RuntimeError('Bad network...')
+        self.after_request(self._s, resp)
+
         return resp
 
-    def before_request(self):
+    def before_request(self, session):
         '''
         Hook函数，每次HTTP请求前被调用。
 
         Args:
-            None
+            session (requests.Session): requests Session对象。
 
         Returns:
             None
         '''
 
-    def after_request(self):
+    def after_request(self, session, resp):
         '''
         Hook函数，每次HTTP请求后备调用。
 
         Args:
-            None
+            session (requests.Session): requests Session对象。
+            resp (requests.Response): requests.Response对象。
 
         Returns:
             None
