@@ -43,7 +43,7 @@ class CrawlerHttpClient(object):
         Returns:
             None
         '''
-        self._login = True
+        self._login = False
         self._auth_info = None
         self._tries = tries
         self._try_internal = try_internal
@@ -72,7 +72,7 @@ class CrawlerHttpClient(object):
             None
         '''
         if self._login is False:
-            self._login()
+            self.system_login()
 
         if data is not None:
             url = url + urllib.urlencode(data)
@@ -109,6 +109,7 @@ class CrawlerHttpClient(object):
         Returns:
             None
         '''
+        pass
 
     def after_request(self, session, resp):
         '''
@@ -121,6 +122,7 @@ class CrawlerHttpClient(object):
         Returns:
             None
         '''
+        pass
 
     def __call__(self, *args, **kwargs):
         return self.get(*args, **kwargs)
@@ -153,8 +155,8 @@ class CrawlerHttpClient(object):
             return self._login()
         return True
 
-    def _login(self):
-        raise NotImplementedError()
+    def system_login(self):
+        self._login = True
 
 
 if __name__ == '__main__':
