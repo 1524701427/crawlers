@@ -77,16 +77,18 @@ class CrawlerHttpClient(object):
         if data is not None:
             url = url + '?' + urllib.urlencode(data)
 
-        req = requests.Request(
-            'GET', url=url, timeout=timeout,
-            allow_redirects=self._allow_redirects)
-        prepared_req = req.Prepare()
+        req = requests.Request('GET', url=url)
+        prepared_req = req.prepare()
 
         self.before_request(prepared_req)
 
         for i in range(self._tries):
             try:
-                resp = self._s.send(prepared_req)
+                resp = self._s.send(
+                    prepared_req,
+                    timeout=timeout,
+                    allow_redirects=self._allow_redirects,
+                )
                 break
 
             except (ConnectionError, Timeout):
@@ -162,4 +164,5 @@ class CrawlerHttpClient(object):
 
 
 if __name__ == '__main__':
-    pass
+    httpclient = CrawlerHttpClient()
+    httpclient.get('http://www.weiche.cn')
