@@ -75,7 +75,7 @@ class CrawlerHttpClient(object):
             self.system_login()
 
         if data is not None:
-            url = url + urllib.urlencode(data)
+            url = url + '?' + urllib.urlencode(data)
 
         self.before_request(self._s)
 
@@ -87,10 +87,11 @@ class CrawlerHttpClient(object):
                     allow_redirects=self._allow_redirects,
                 )
                 break
+
             except (ConnectionError, Timeout):
-                self._count += 1
                 sleep((i+1)*self._try_internal)
                 continue
+
             except (HTTPError, TooManyRedirects):
                 raise RuntimeError('Unavaliable url...')
         else:
