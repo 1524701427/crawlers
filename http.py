@@ -4,6 +4,7 @@ from __future__ import with_statement, print_function
 
 import time
 import urllib
+import urlparse
 
 import requests
 from requests.exceptions import (
@@ -24,6 +25,7 @@ class CrawlerHttpClient(object):
 
     def __init__(
             self,
+            base_url=None,
             default_headers=None,
             tries=3,
             try_internal=1,
@@ -34,6 +36,7 @@ class CrawlerHttpClient(object):
         初始化一个爬虫客户端。
 
         Args:
+            base_url (str): 解析URL相对路径的参考地址。
             default_headers (dict): 爬虫默认HTTP头信息。
             tries (int): 请求资源失败，重试次数。
             try_internal (int): 请求资源失败，重试间隔。
@@ -45,6 +48,8 @@ class CrawlerHttpClient(object):
         '''
         self._login = False
         self._auth_info = None
+
+        self._base_url = base_url
         self._tries = tries
         self._try_internal = try_internal
         self._rate_limit = rate_limit
@@ -73,6 +78,9 @@ class CrawlerHttpClient(object):
         '''
         if self._login is False:
             self.system_login()
+
+        if not url.startswith('http'):
+            url = urlparse.urljoin(self._base_url, url)
 
         if data is not None:
             url = url + '?' + urllib.urlencode(data)
