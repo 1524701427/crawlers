@@ -77,15 +77,16 @@ class CrawlerHttpClient(object):
         if data is not None:
             url = url + '?' + urllib.urlencode(data)
 
-        self.before_request(self._s)
+        req = requests.Request(
+            'GET', url=url, timeout=timeout,
+            allow_redirects=self._allow_redirects)
+        prepared_req = req.Prepare()
+
+        self.before_request(prepared_req)
 
         for i in range(self._tries):
             try:
-                resp = self._s.get(
-                    url,
-                    timeout=timeout,
-                    allow_redirects=self._allow_redirects,
-                )
+                resp = self._s.send(prepared_req)
                 break
 
             except (ConnectionError, Timeout):
@@ -100,12 +101,12 @@ class CrawlerHttpClient(object):
 
         return resp
 
-    def before_request(self, session):
+    def before_request(self, prepared_req):
         '''
         Hook函数，每次HTTP请求前被调用。
 
         Args:
-            session (requests.Session): requests Session对象。
+            prepared_req (requests.PreparedRequest): requests PreparedRequst对象。
 
         Returns:
             None
