@@ -23,6 +23,11 @@ class SchemaType:
     HTTP = 1  # HTTP协议
     HTTPS = 2  # HTTPS协议
 
+schema_type2schema = {
+    SchemaType.HTTP: 'http',
+    SchemaType.HTTPS: 'https',
+}
+
 
 class ProxyPool(object):
     '''代理池对象'''
@@ -40,23 +45,36 @@ class ProxyPool(object):
         self._max_size = max_size
         self._pool = deque(maxlen=max_size)
 
-    def fetch(self, random=True):
+    def fetch(self, random=True, requests_style=False):
         '''
         从代理池中获取一个代理。
 
         Args:
             random (bool): 是否随机获取。
+            requests_style (bool): 是否使用requests风格的proxy。
+
+        Returns:
+            dict: 描述代理的字典。
         '''
         try:
             if random is True:
                 proxy = choice(self._pool)
             else:
                 proxy = self._pool.pop_left()
+            if requests_style is True:
+                schema = schema_type2schema[proxy['schema']]
+                url = '%s://' % schema
+                if 'user' in proxy and 'password' in proxy:
+                    url + '%s@%s:' % (proxy['user'], proxy['password'])
+                url += proxy['host']
+                if 'port' in proxy:
+                    url += ':%d' % proxy['port']
+                proxy = dict(schema=url)
             return proxy
         except IndexError:
             raise ProxyPoolEmptyError()
 
-    def push(self, proxy):
+    def push(self, proxy, **kwargs):
         '''
         向代理池中增加一个代理。
 
