@@ -21,6 +21,12 @@ except ImportError:
     sleep = time.sleep
 
 
+class ProxyUnavaliableError(StandardError):
+    '''
+    代理不可用。'''
+    pass
+
+
 class CrawlerHttpClient(object):
 
     def __init__(
@@ -31,6 +37,7 @@ class CrawlerHttpClient(object):
             try_internal=1,
             rate_limit=None,
             allow_redirects=True,
+            proxies_pool=None,
     ):
         '''
         初始化一个爬虫客户端。
@@ -42,6 +49,7 @@ class CrawlerHttpClient(object):
             try_internal (int): 请求资源失败，重试间隔。
             rate_limit (int): 请求资源次数限制。
             allow_redirects (bool): 是否追踪重定向。
+            proxies_pool (ProxyPool): 代理池对象。
 
         Returns:
             None
