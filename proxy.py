@@ -17,6 +17,13 @@ class ProxyPoolEmptyError(StandardError):
     pass
 
 
+class SchemaType:
+    '''schema类型。'''
+    ALL = 0  # 全部类型
+    HTTP = 1  # HTTP协议
+    HTTPS = 2  # HTTPS协议
+
+
 class ProxyPool(object):
     '''代理池对象'''
 
@@ -48,3 +55,23 @@ class ProxyPool(object):
             return proxy
         except IndexError:
             raise ProxyPoolEmptyError()
+
+    def push(self, proxy):
+        '''
+        向代理池中增加一个代理。
+
+        Args:
+            proxy (dict): 代表代理的字典。
+
+        Returns:
+            None
+
+        Demo:
+            >> pool = ProxyPool()
+            >> proxy = dict(
+            >>      schema=SchemaType.HTTP, host='127.0.0.1', port=9000,
+            >>      user='user', password='password')
+            >> pool.push(proxy)
+
+        '''
+        self._pool.append(proxy)
