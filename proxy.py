@@ -54,7 +54,7 @@ class ProxyPool(object):
             proxy (dict): 代理。
 
         Returns:
-            dict - requests风格的代理。
+            str - 代理。
         '''
         schema = schema_type2schema[proxy['schema']]
         auth_part = ''
@@ -63,7 +63,7 @@ class ProxyPool(object):
         port_part = ''
         if 'port' in proxy:
             port_part = ':%d' % proxy['port']
-        return dict(schema=''.join([schema, '://', auth_part, proxy['host'], port_part]))  # noqa
+        return ''.join([schema, '://', auth_part, proxy['host'], port_part])
 
     def fetch(self, random=True, requests_style=False, remove=False):
         '''
@@ -85,7 +85,7 @@ class ProxyPool(object):
             if remove is True:
                 del self._pool[index]
             if requests_style is True:
-                proxy = self.format_proxy(proxy)
+                proxy = {schema_type2schema[proxy['schema']]: self.format_proxy(proxy)}  # noqa
             return proxy
         except IndexError:
             raise ProxyPoolEmptyError()
