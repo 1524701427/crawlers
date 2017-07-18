@@ -48,7 +48,14 @@ class ProxyPool(object):
     @classmethod
     def format_proxy(self, proxy):
         '''
-        将proxy格式化为http://user@pass:host:port的格式。'''
+        将proxy格式化为http://user@pass:host:port的格式。
+
+        Args:
+            proxy (dict): 代理。
+
+        Returns:
+            dict - requests风格的代理。
+        '''
         schema = schema_type2schema[proxy['schema']]
         auth_part = ''
         if 'user' in proxy and 'password' in proxy:
@@ -56,7 +63,7 @@ class ProxyPool(object):
         port_part = ''
         if 'port' in proxy:
             port_part = ':%d' % proxy['port']
-        return ''.join([schema, '://', auth_part, proxy['host'], port_part])
+        return dict(schema=''.join([schema, '://', auth_part, proxy['host'], port_part]))  # noqa
 
     def fetch(self, random=True, requests_style=False, remove=False):
         '''
