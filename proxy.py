@@ -56,7 +56,7 @@ class ProxyPool(object):
         port_part = ''
         if 'port' in proxy:
             port_part = ':%d' % proxy['port']
-        return ''.join(schema, '://', auth_part, proxy['host'], port_part)
+        return ''.join([schema, '://', auth_part, proxy['host'], port_part])
 
     def fetch(self, random=True, requests_style=False, remove=False):
         '''
@@ -102,3 +102,9 @@ class ProxyPool(object):
 
         '''
         self._pool.append(proxy)
+
+
+if __name__ == '__main__':
+    pool = ProxyPool()
+    pool.push(dict(schema=1, host='127.0.0.1', port=9000))
+    print(pool.fetch(requests_style=True))
