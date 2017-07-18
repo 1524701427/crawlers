@@ -45,6 +45,19 @@ class ProxyPool(object):
         self._max_size = max_size
         self._pool = deque(maxlen=max_size)
 
+    @classmethod
+    def format_proxy(self, proxy):
+        '''
+        将proxy格式化为http://user@pass:host:port的格式。'''
+        schema = schema_type2schema[proxy['schema']]
+        auth_part = ''
+        if 'user' in proxy and 'password' in proxy:
+            auth_part = '%s@%s:' % (proxy['user'], proxy['password'])
+        port_part = ''
+        if 'port' in proxy:
+            port_part = ':%d' % proxy['port']
+        return ''.join(schema, '://', auth_part, proxy['host'], port_part)
+
     def fetch(self, random=True, requests_style=False):
         '''
         从代理池中获取一个代理。
@@ -62,14 +75,7 @@ class ProxyPool(object):
             else:
                 proxy = self._pool.pop_left()
             if requests_style is True:
-                schema = schema_type2schema[proxy['schema']]
-                url = '%s://' % schema
-                if 'user' in proxy and 'password' in proxy:
-                    url + '%s@%s:' % (proxy['user'], proxy['password'])
-                url += proxy['host']
-                if 'port' in proxy:
-                    url += ':%d' % proxy['port']
-                proxy = dict(schema=url)
+                proxy = self.format_proxy(proxy)
             return proxy
         except IndexError:
             raise ProxyPoolEmptyError()
