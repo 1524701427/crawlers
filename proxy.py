@@ -2,7 +2,7 @@
 
 from __future__ import with_statement, print_function
 
-from random import choice
+from random import randint
 from collections import deque
 
 
@@ -58,22 +58,25 @@ class ProxyPool(object):
             port_part = ':%d' % proxy['port']
         return ''.join(schema, '://', auth_part, proxy['host'], port_part)
 
-    def fetch(self, random=True, requests_style=False):
+    def fetch(self, random=True, requests_style=False, remove=False):
         '''
         从代理池中获取一个代理。
 
         Args:
             random (bool): 是否随机获取。
             requests_style (bool): 是否使用requests风格的proxy。
+            remove (bool): 是否从代理池中取走。
 
         Returns:
             dict: 描述代理的字典。
         '''
         try:
-            if random is True:
-                proxy = choice(self._pool)
-            else:
-                proxy = self._pool.pop_left()
+            index = 0
+            if random is True and len(self._pool):
+                index = randint(0, len(self._pool)-1)
+            proxy = self._pool[index]
+            if remove is True:
+                del self._pool[index]
             if requests_style is True:
                 proxy = self.format_proxy(proxy)
             return proxy
