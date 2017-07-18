@@ -62,6 +62,7 @@ class CrawlerHttpClient(object):
         self._try_internal = try_internal
         self._rate_limit = rate_limit
         self._allow_redirects = allow_redirects
+        self._proxies_pool = proxies_pool
 
         self._last_active_time = int(time.time())
         self._count = 0
