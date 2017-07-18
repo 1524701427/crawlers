@@ -21,5 +21,10 @@ class ProxyPoolEmptyError(ProxyError):
     pass
 
 
+class ProxyTooLittleError(ProxyError):
+    '''代理池中代理数量过少。'''
+    pass
+
+
 if __name__ == '__main__':
     raise ProxyUnavaliableError(u'代理不可用。')

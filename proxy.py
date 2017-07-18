@@ -2,7 +2,6 @@
 
 from __future__ import with_statement, print_function
 
-from random import randint
 from collections import deque
 
 from core.enum import Enum
@@ -29,7 +28,7 @@ class ProxyPool(object):
 
         Args:
             max_size (int): 指定代理池容量, None - 不限容量。
-            strategy (object): 代理池。
+            strategy (object): 从代理池取代理的策略。
 
         Returns:
             None
@@ -58,28 +57,18 @@ class ProxyPool(object):
             port_part = ':%d' % proxy['port']
         return ''.join([schema, '://', auth_part, proxy['host'], port_part])
 
-    def fetch(self, random=True, requests_style=False, remove=False):
+    def fetch(self, requests_style=False):
         '''
         从代理池中获取一个代理。
 
         Args:
-            random (bool): 是否随机获取。
             requests_style (bool): 是否使用requests风格的proxy。
-            remove (bool): 是否从代理池中取走。
 
         Returns:
             dict: 描述代理的字典。
         '''
         try:
-            index = 0
-            if random is True and len(self._pool):
-                index = randint(0, len(self._pool)-1)
-            proxy = self._pool[index]
-            if remove is True:
-                del self._pool[index]
-            if requests_style is True:
-                proxy = {schema_type2schema[proxy['schema']]: self.format_proxy(proxy)}  # noqa
-            return proxy
+            pass
         except IndexError:
             raise ProxyPoolEmptyError()
 
@@ -107,6 +96,19 @@ class ProxyPool(object):
 def ProxyFetchStrategy(object):
     '''
     代理获取策略。'''
+    pass
+
+
+class ProxyCycleFetchStrategy(ProxyFetchStrategy):
+    '''队列轮询策略。'''
+
+    def __init__(self, pool):
+        '''
+        构造队列轮询策略。
+
+        Args:
+            pool (deque): 代理池。
+        '''
 
 
 if __name__ == '__main__':
