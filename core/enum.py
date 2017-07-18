@@ -22,7 +22,7 @@ class EnumMeta(type):
                 raise AttributeError('%s should be written in upper case.' % k)
             if not isinstance(v, (long, int)):
                 raise ValueError('only int/long.')
-        attr2value['ALL_AVALIABLE_VALUES'] = attr2value.values()
+        attr2value['ALL_AVALIABLE_VALUES'] = sorted(attr2value.values())
 
         return type.__new__(metacls, cls, bases, attr2value)
 
@@ -33,5 +33,10 @@ class Enum(object):
 
 
 if __name__ == '__main__':
-    o = Enum()
-    print o.ALL_AVALIABLE_VALUES
+
+    class ColorType(Enum):
+        RED = 0
+        BLUE = 1
+        GREEN = 2
+
+    print ColorType.ALL_AVALIABLE_VALUES
