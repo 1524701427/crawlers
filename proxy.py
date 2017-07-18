@@ -23,18 +23,20 @@ schema_type2schema = {
 class ProxyPool(object):
     '''代理池对象'''
 
-    def __init__(self, max_size=None):
+    def __init__(self, max_size=None, strategy=None):
         '''
         初始化代理池。
 
         Args:
             max_size (int): 指定代理池容量, None - 不限容量。
+            strategy (object): 代理池。
 
         Returns:
             None
         '''
         self._max_size = max_size
         self._pool = deque(maxlen=max_size)
+        self._strategy = strategy
 
     @classmethod
     def format_proxy(self, proxy):
@@ -100,6 +102,11 @@ class ProxyPool(object):
 
         '''
         self._pool.append(proxy)
+
+
+def ProxyFetchStrategy(object):
+    '''
+    代理获取策略。'''
 
 
 if __name__ == '__main__':

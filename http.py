@@ -21,12 +21,6 @@ except ImportError:
     sleep = time.sleep
 
 
-class ProxyUnavaliableError(StandardError):
-    '''
-    代理不可用。'''
-    pass
-
-
 class CrawlerHttpClient(object):
 
     def __init__(
