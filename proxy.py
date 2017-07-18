@@ -6,17 +6,7 @@ from random import randint
 from collections import deque
 
 from core.enum import Enum
-
-
-class ProxyUnavaliableError(StandardError):
-    '''
-    代理不可用。'''
-    pass
-
-
-class ProxyPoolEmptyError(StandardError):
-    '''代理池为空。'''
-    pass
+from core.exceptions import ProxyPoolEmptyError
 
 
 class SchemaType(Enum):
