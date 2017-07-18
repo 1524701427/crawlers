@@ -20,6 +20,8 @@ class EnumMeta(type):
             attr2value[k] = v
             if not metacls.pattern.match(k):
                 raise AttributeError('%s should be written in upper case.' % k)
+            if not isinstance(v, (long, int)):
+                raise ValueError('only int/long.')
         attr2value['ALL_AVALIABLE_VALUES'] = attr2value.values()
 
         return type.__new__(metacls, cls, bases, attr2value)
