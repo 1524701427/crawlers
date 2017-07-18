@@ -4,6 +4,8 @@
 '''
 枚举类型的Python实现。'''
 
+from __future__ import print_function
+
 import re
 
 
@@ -39,4 +41,4 @@ if __name__ == '__main__':
         BLUE = 1
         GREEN = 2
 
-    print ColorType.ALL_AVALIABLE_VALUES
+    print(ColorType.ALL_AVALIABLE_VALUES)
