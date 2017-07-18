@@ -5,6 +5,8 @@ from __future__ import with_statement, print_function
 from random import randint
 from collections import deque
 
+from core.enum import Enum
+
 
 class ProxyUnavaliableError(StandardError):
     '''
@@ -17,11 +19,10 @@ class ProxyPoolEmptyError(StandardError):
     pass
 
 
-class SchemaType:
+class SchemaType(Enum):
     '''schema类型。'''
-    ALL = 0  # 全部类型
-    HTTP = 1  # HTTP协议
-    HTTPS = 2  # HTTPS协议
+    HTTP = 0  # HTTP协议
+    HTTPS = 1  # HTTPS协议
 
 schema_type2schema = {
     SchemaType.HTTP: 'http',
