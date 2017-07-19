@@ -191,9 +191,4 @@ class CrawlerHttpClient(object):
 
 
 if __name__ == '__main__':
-    from proxy import ProxyPool, ProxyCycleFetchStrategy
-    pool = ProxyPool(strategy=ProxyCycleFetchStrategy)
-    pool.push(dict(schema=0, host='61.152.81.193', port=9100))
-    httpclient = CrawlerHttpClient(proxies_pool=pool)
-    resp = httpclient.get('http://www.weiche.cn')
-    print(resp.text)
+    pass

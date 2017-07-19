@@ -13,6 +13,7 @@ class SchemaType(Enum):
     HTTP = 0  # HTTP协议
     HTTPS = 1  # HTTPS协议
 
+
 schema_type2schema = {
     SchemaType.HTTP: 'http',
     SchemaType.HTTPS: 'https',
@@ -135,7 +136,4 @@ class ProxyCycleFetchStrategy(ProxyFetchStrategy):
 
 
 if __name__ == '__main__':
-    pool = ProxyPool(strategy=ProxyCycleFetchStrategy)
-    pool.push(dict(schema=SchemaType.HTTP, host='127.0.0.1', port=9000))
-    for i in pool.iteritems(requests_style=True):
-        print(i)
+    pass
