@@ -85,12 +85,12 @@ class CrawlerHttpClient(object):
             timeout (int): 请求超时时间。
 
         Returns:
-            None
+            requests.Response: requests.Response对象。
         '''
         if self._login is False:
             self.system_login()
 
-        if not url.startswith('http'):
+        if not url.lower().startswith('http'):
             url = urlparse.urljoin(self._base_url, url)
 
         if data is not None:
