@@ -14,6 +14,8 @@ from requests.exceptions import (
     TooManyRedirects,
 )
 
+from core.exceptions import ProxyUnavaliableError
+
 try:
     import gevent
     sleep = gevent.sleep
@@ -27,10 +29,12 @@ class CrawlerHttpClient(object):
             self,
             base_url=None,
             default_headers=None,
+            default_timeout=10,
             tries=3,
             try_internal=1,
             rate_limit=None,
             allow_redirects=True,
+            proxies_pool=None,
     ):
         '''
         初始化一个爬虫客户端。
@@ -38,10 +42,12 @@ class CrawlerHttpClient(object):
         Args:
             base_url (str): 解析URL相对路径的参考地址。
             default_headers (dict): 爬虫默认HTTP头信息。
+            default_timeout (int): 默认的timeout描述。
             tries (int): 请求资源失败，重试次数。
             try_internal (int): 请求资源失败，重试间隔。
             rate_limit (int): 请求资源次数限制。
             allow_redirects (bool): 是否追踪重定向。
+            proxies_pool (ProxyPool): 代理池对象。
 
         Returns:
             None
@@ -54,6 +60,11 @@ class CrawlerHttpClient(object):
         self._try_internal = try_internal
         self._rate_limit = rate_limit
         self._allow_redirects = allow_redirects
+        self._timeout = default_timeout
+        self._proxies_pool = proxies_pool
+        if self._proxies_pool is not None:
+            self._generator = \
+                self._proxies_pool.iteritems(requests_style=True)
 
         self._last_active_time = int(time.time())
         self._count = 0
@@ -85,6 +96,10 @@ class CrawlerHttpClient(object):
         if data is not None:
             url = url + '?' + urllib.urlencode(data)
 
+        proxies = None
+        if hasattr(self, '_generator'):
+            proxies = next(self._generator)
+
         req = requests.Request('GET', url=url)
         prepared_req = req.prepare()
 
@@ -94,7 +109,8 @@ class CrawlerHttpClient(object):
             try:
                 resp = self._s.send(
                     prepared_req,
-                    timeout=timeout,
+                    proxies=proxies,
+                    timeout=timeout or self._timeout,
                     allow_redirects=self._allow_redirects,
                 )
                 break
@@ -106,6 +122,9 @@ class CrawlerHttpClient(object):
             except (HTTPError, TooManyRedirects):
                 raise RuntimeError('Unavaliable url...')
         else:
+            if proxies is not None:
+                # TODO: add code. 向代理池反馈代理的可用性。
+                raise ProxyUnavaliableError()
             raise RuntimeError('Bad network...')
         self.after_request(self._s, resp)
 
@@ -172,5 +191,9 @@ class CrawlerHttpClient(object):
 
 
 if __name__ == '__main__':
-    httpclient = CrawlerHttpClient()
-    httpclient.get('http://www.weiche.cn')
+    from proxy import ProxyPool, ProxyCycleFetchStrategy
+    pool = ProxyPool(strategy=ProxyCycleFetchStrategy)
+    pool.push(dict(schema=0, host='61.152.81.193', port=9100))
+    httpclient = CrawlerHttpClient(proxies_pool=pool)
+    resp = httpclient.get('http://www.weiche.cn')
+    print(resp.text)
