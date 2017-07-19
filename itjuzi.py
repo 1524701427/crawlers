@@ -184,7 +184,11 @@ def crawler(user, password):
                     break
 
                 project['name'] = tag_li.p.a.string
-                project['industry'] = tag_spans[2].a.string
+                project['industry'] = ''
+                try:
+                    project['industry'] = tag_spans[2].a.string
+                except:
+                    pass
 
                 time.sleep(5)
                 detail_url = project['url']
@@ -194,7 +198,10 @@ def crawler(user, password):
                 project['location'] = ''
                 locations = detail_soup.select('span[class="loca c-gray-aset"]')
                 if locations:
-                    project['location'] = locations[0].a.string.strip()
+                    try:
+                        project['location'] = locations[0].a.string.strip()
+                    except:
+                        pass
 
                 # 项目状态
                 project['investing'] = ''
@@ -229,7 +236,7 @@ def crawler(user, password):
                 projects.append(project)
         time.sleep(5)
         # itjuzi最多可以爬50页数据
-        if page - init_page >= 50:
+        if page - init_page >= 100:
             break
     last_id = projects[0]['id']
     set_last_id(last_id)
