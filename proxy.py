@@ -35,7 +35,7 @@ class ProxyPool(object):
         '''
         self._max_size = max_size
         self._pool = deque(maxlen=max_size)
-        self._strategy = strategy
+        self._strategy = strategy(self._pool)
 
     @classmethod
     def format_proxy(self, proxy):
@@ -68,7 +68,10 @@ class ProxyPool(object):
             dict: 描述代理的字典。
         '''
         try:
-            pass
+            proxy = self._strategy.fetch()
+            if requests_style is True:
+                proxy = {schema_type2schema[proxy['schema']]: self.format_proxy(proxy)}  # noqa
+            return proxy
         except IndexError:
             raise ProxyPoolEmptyError()
 
@@ -93,7 +96,7 @@ class ProxyPool(object):
         self._pool.append(proxy)
 
 
-def ProxyFetchStrategy(object):
+class ProxyFetchStrategy(object):
     '''
     代理获取策略。'''
 
@@ -111,6 +114,7 @@ class ProxyCycleFetchStrategy(ProxyFetchStrategy):
         Args:
             pool (deque): 代理池。
         '''
+        super(ProxyCycleFetchStrategy, self).__init__()
         self._pool = pool
         self._pos = 0
 
@@ -122,6 +126,6 @@ class ProxyCycleFetchStrategy(ProxyFetchStrategy):
 
 
 if __name__ == '__main__':
-    pool = ProxyPool()
-    pool.push(dict(schema=1, host='127.0.0.1', port=9000))
+    pool = ProxyPool(strategy=ProxyCycleFetchStrategy)
+    pool.push(dict(schema=SchemaType.HTTP, host='127.0.0.1', port=9000))
     print(pool.fetch(requests_style=True))
