@@ -2,6 +2,7 @@
 
 from __future__ import with_statement, print_function
 
+import functools
 from collections import deque
 
 from core.enum import Enum
@@ -95,6 +96,22 @@ class ProxyPool(object):
         '''
         self._pool.append(proxy)
 
+    def __iter__(self):
+        return self
+
+    def next(self):
+        if hasattr(self, '_requests_styple'):
+            try:
+                while True:
+                    proxy = self.fetch(self._requests_style)
+                    yield proxy
+            except:
+                raise StopIteration()
+
+    def iteritems(self, requests_style=False):
+        self._requests_styple = requests_style
+        return self
+
 
 class ProxyFetchStrategy(object):
     '''
@@ -129,3 +146,8 @@ if __name__ == '__main__':
     pool = ProxyPool(strategy=ProxyCycleFetchStrategy)
     pool.push(dict(schema=SchemaType.HTTP, host='127.0.0.1', port=9000))
     print(pool.fetch(requests_style=True))
+
+    r = pool.iteritems(requests_style=True)
+    #  print(x for x in dir(r) if not r.startswith('_'))
+    for i in r:
+        print(i['host'])
