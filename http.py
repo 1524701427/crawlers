@@ -57,6 +57,9 @@ class CrawlerHttpClient(object):
         self._rate_limit = rate_limit
         self._allow_redirects = allow_redirects
         self._proxies_pool = proxies_pool
+        if self._proxies_pool is not None:
+            self._generator = \
+                self._proxies_pool.iteritems(requests_style=True)
 
         self._last_active_time = int(time.time())
         self._count = 0
@@ -88,6 +91,10 @@ class CrawlerHttpClient(object):
         if data is not None:
             url = url + '?' + urllib.urlencode(data)
 
+        proxy = None
+        if hasattr(self, '_generator'):
+            proxy = next(self._generator)
+
         req = requests.Request('GET', url=url)
         prepared_req = req.prepare()
 
@@ -98,6 +105,7 @@ class CrawlerHttpClient(object):
                 resp = self._s.send(
                     prepared_req,
                     timeout=timeout,
+                    proxies=proxy,
                     allow_redirects=self._allow_redirects,
                 )
                 break
