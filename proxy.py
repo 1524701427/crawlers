@@ -20,7 +20,7 @@ schema_type2schema = {
 
 
 class ProxyPool(object):
-    '''代理池对象'''
+    '''代理池对象, 非线程安全。'''
 
     def __init__(self, max_size=None, strategy=None):
         '''
@@ -28,7 +28,7 @@ class ProxyPool(object):
 
         Args:
             max_size (int): 指定代理池容量, None - 不限容量。
-            strategy (object): 从代理池取代理的策略。
+            strategy (ProxyFetchStrategy): 从代理池取代理的策略。
 
         Returns:
             None
@@ -96,7 +96,9 @@ class ProxyPool(object):
 def ProxyFetchStrategy(object):
     '''
     代理获取策略。'''
-    pass
+
+    def fetch(self):
+        raise NotImplementedError()
 
 
 class ProxyCycleFetchStrategy(ProxyFetchStrategy):
@@ -109,6 +111,14 @@ class ProxyCycleFetchStrategy(ProxyFetchStrategy):
         Args:
             pool (deque): 代理池。
         '''
+        self._pool = pool
+        self._pos = 0
+
+    def fetch(self):
+        self._pos = self._pos % len(self._pool)
+        element = self._pool[self._pos]
+        self._pos += 1
+        return element
 
 
 if __name__ == '__main__':
