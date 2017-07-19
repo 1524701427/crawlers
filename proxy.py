@@ -70,7 +70,7 @@ class ProxyPool(object):
         try:
             proxy = self._strategy.fetch()
             if requests_style is True:
-                proxy = {schema_type2schema[proxy['schema']]: self.format_proxy(proxy)}  # noqa
+                proxy = {schema_type2schema[proxy['schema']]: proxy['url']}
             return proxy
         except IndexError:
             raise ProxyPoolEmptyError()
@@ -93,6 +93,8 @@ class ProxyPool(object):
             >> pool.push(proxy)
 
         '''
+        if 'url' not in proxy:
+            proxy['url'] = self.format_proxy(proxy)
         self._pool.append(proxy)
 
     def iteritems(self, requests_style=False):

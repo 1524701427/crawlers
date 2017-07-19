@@ -123,6 +123,7 @@ class CrawlerHttpClient(object):
                 raise RuntimeError('Unavaliable url...')
         else:
             if proxies is not None:
+                # TODO: add code. 向代理池反馈代理的可用性。
                 raise ProxyUnavaliableError()
             raise RuntimeError('Bad network...')
         self.after_request(self._s, resp)
