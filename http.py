@@ -29,6 +29,7 @@ class CrawlerHttpClient(object):
             self,
             base_url=None,
             default_headers=None,
+            default_timeout=10,
             tries=3,
             try_internal=1,
             rate_limit=None,
@@ -41,6 +42,7 @@ class CrawlerHttpClient(object):
         Args:
             base_url (str): 解析URL相对路径的参考地址。
             default_headers (dict): 爬虫默认HTTP头信息。
+            default_timeout (int): 默认的timeout描述。
             tries (int): 请求资源失败，重试次数。
             try_internal (int): 请求资源失败，重试间隔。
             rate_limit (int): 请求资源次数限制。
@@ -58,6 +60,7 @@ class CrawlerHttpClient(object):
         self._try_internal = try_internal
         self._rate_limit = rate_limit
         self._allow_redirects = allow_redirects
+        self._timeout = default_timeout
         self._proxies_pool = proxies_pool
         if self._proxies_pool is not None:
             self._generator = \
@@ -106,8 +109,8 @@ class CrawlerHttpClient(object):
             try:
                 resp = self._s.send(
                     prepared_req,
-                    timeout=timeout,
                     proxies=proxies,
+                    timeout=timeout or self._timeout,
                     allow_redirects=self._allow_redirects,
                 )
                 break
