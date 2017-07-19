@@ -93,9 +93,9 @@ class CrawlerHttpClient(object):
         if data is not None:
             url = url + '?' + urllib.urlencode(data)
 
-        proxy = None
+        proxies = None
         if hasattr(self, '_generator'):
-            proxy = next(self._generator)
+            proxies = next(self._generator)
 
         req = requests.Request('GET', url=url)
         prepared_req = req.prepare()
@@ -107,7 +107,7 @@ class CrawlerHttpClient(object):
                 resp = self._s.send(
                     prepared_req,
                     timeout=timeout,
-                    proxies=proxy,
+                    proxies=proxies,
                     allow_redirects=self._allow_redirects,
                 )
                 break
@@ -119,7 +119,7 @@ class CrawlerHttpClient(object):
             except (HTTPError, TooManyRedirects):
                 raise RuntimeError('Unavaliable url...')
         else:
-            if proxy is not None:
+            if proxies is not None:
                 raise ProxyUnavaliableError()
             raise RuntimeError('Bad network...')
         self.after_request(self._s, resp)
@@ -187,5 +187,9 @@ class CrawlerHttpClient(object):
 
 
 if __name__ == '__main__':
-    httpclient = CrawlerHttpClient()
-    httpclient.get('http://www.weiche.cn')
+    from proxy import ProxyPool, ProxyCycleFetchStrategy
+    pool = ProxyPool(strategy=ProxyCycleFetchStrategy)
+    pool.push(dict(schema=0, host='61.152.81.193', port=9100))
+    httpclient = CrawlerHttpClient(proxies_pool=pool)
+    resp = httpclient.get('http://www.weiche.cn')
+    print(resp.text)
