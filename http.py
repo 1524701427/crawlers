@@ -14,6 +14,8 @@ from requests.exceptions import (
     TooManyRedirects,
 )
 
+from core.exceptions import ProxyUnavaliableError
+
 try:
     import gevent
     sleep = gevent.sleep
@@ -117,6 +119,8 @@ class CrawlerHttpClient(object):
             except (HTTPError, TooManyRedirects):
                 raise RuntimeError('Unavaliable url...')
         else:
+            if proxy is not None:
+                raise ProxyUnavaliableError()
             raise RuntimeError('Bad network...')
         self.after_request(self._s, resp)
 
