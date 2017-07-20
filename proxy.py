@@ -4,6 +4,7 @@ from __future__ import with_statement, print_function
 
 import sys
 import csv
+import random
 import traceback
 from collections import deque
 
@@ -150,6 +151,10 @@ class ProxyFetchStrategy(object):
     '''
     代理获取策略。'''
 
+    def __init__(self, pool):
+        super(ProxyCycleFetchStrategy, self).__init__()
+        self.pool = pool
+
     def fetch(self):
         raise NotImplementedError()
 
@@ -158,21 +163,21 @@ class ProxyCycleFetchStrategy(ProxyFetchStrategy):
     '''队列轮询策略。'''
 
     def __init__(self, pool):
-        '''
-        构造队列轮询策略。
-
-        Args:
-            pool (deque): 代理池。
-        '''
-        super(ProxyCycleFetchStrategy, self).__init__()
-        self._pool = pool
+        super(ProxyCycleFetchStrategy, self).__init__(pool)
         self._pos = 0
 
     def fetch(self):
-        self._pos = self._pos % len(self._pool)
-        element = self._pool[self._pos]
+        self._pos = self._pos % len(self.pool)
+        element = self.pool[self._pos]
         self._pos += 1
         return element
+
+
+class ProxyRandomFetchStrategy(ProxyFetchStrategy):
+    '''随机查询策略。'''
+
+    def fetch(self):
+        return random.choice(self.pool)
 
 
 if __name__ == '__main__':
