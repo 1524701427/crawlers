@@ -85,12 +85,12 @@ class CrawlerHttpClient(object):
             timeout (int): 请求超时时间。
 
         Returns:
-            None
+            requests.Response: requests.Response对象。
         '''
         if self._login is False:
             self.system_login()
 
-        if not url.startswith('http'):
+        if not url.lower().startswith('http'):
             url = urlparse.urljoin(self._base_url, url)
 
         if data is not None:
@@ -191,9 +191,4 @@ class CrawlerHttpClient(object):
 
 
 if __name__ == '__main__':
-    from proxy import ProxyPool, ProxyCycleFetchStrategy
-    pool = ProxyPool(strategy=ProxyCycleFetchStrategy)
-    pool.push(dict(schema=0, host='61.152.81.193', port=9100))
-    httpclient = CrawlerHttpClient(proxies_pool=pool)
-    resp = httpclient.get('http://www.weiche.cn')
-    print(resp.text)
+    pass

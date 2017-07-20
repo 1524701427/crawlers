@@ -22,7 +22,7 @@ class EnumMeta(type):
             attr2value[k] = v
             if not metacls.pattern.match(k):
                 raise AttributeError('%s should be written in upper case.' % k)
-            if not isinstance(v, (long, int)):
+            if not isinstance(v, (int, long)):
                 raise ValueError('only int/long.')
         attr2value['ALL_AVALIABLE_VALUES'] = sorted(attr2value.values())
 
@@ -32,13 +32,3 @@ class EnumMeta(type):
 class Enum(object):
 
     __metaclass__ = EnumMeta
-
-
-if __name__ == '__main__':
-
-    class ColorType(Enum):
-        RED = 0
-        BLUE = 1
-        GREEN = 2
-
-    print(ColorType.ALL_AVALIABLE_VALUES)
