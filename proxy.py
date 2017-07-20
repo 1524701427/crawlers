@@ -2,6 +2,9 @@
 
 from __future__ import with_statement, print_function
 
+import sys
+import csv
+import traceback
 from collections import deque
 
 from core.enum import Enum
@@ -98,6 +101,42 @@ class ProxyPool(object):
         if 'url' not in proxy:
             proxy['url'] = self.format_proxy(proxy)
         self._pool.append(proxy)
+
+    def load_from_csv(
+            self,
+            csv_file,
+            columns=None,
+            delimiter=',',
+            quotechar='|',
+    ):
+        '''
+        从CSV文件中加载代理。
+
+        Args:
+            csv_file (str): 指定CSV文件路径。
+            columns (list): 指定CSV文件的列名。
+            delimiter (str): 指定CSV文件的分隔符，默认为逗号（comma）。
+            quotechar (str): 引用字符，默认为'|'。
+
+        Returns:
+            None
+        '''
+        try:
+            with open(csv_file, 'rb') as f:
+                if columns is None:
+                    columns = ['schema', 'user', 'password', 'host', 'port']
+                reader = csv.reader(
+                    f, delimiter=delimiter, quotechar=quotechar, quoting=csv.QUOTE_NONNUMERIC)  # noqa
+                for row in reader:
+                    proxy = dict()
+                    for k, idx in zip(columns, range(len(columns))):
+                        v = row[idx]
+                        if isinstance(v, float):
+                            v = int(v)
+                        proxy[k] = v
+                    self.push(proxy)
+        except IOError:
+            traceback.print_exc(file=sys.stderr)
 
     def iteritems(self, requests_style=False):
         try:
