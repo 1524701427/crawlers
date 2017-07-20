@@ -12,7 +12,7 @@ import re
 class EnumMeta(type):
     '''
     枚举类型，元类，枚举类型的成员变量（类的属性）必须为大写格式。'''
-    pattern = re.compile(r'^[A-Z]+$')
+    pattern = re.compile(r'^[_0-9A-Z]+$')
 
     def __new__(metacls, cls, bases, namespace):
         attr2value = dict()

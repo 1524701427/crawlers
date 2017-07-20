@@ -93,6 +93,7 @@ class ProxyPool(object):
             >> pool.push(proxy)
 
         '''
+        assert proxy['schema'] in schema_type2schema.keys()
         if 'url' not in proxy:
             proxy['url'] = self.format_proxy(proxy)
         self._pool.append(proxy)
