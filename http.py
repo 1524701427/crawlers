@@ -53,7 +53,6 @@ class CrawlerHttpClient(object):
             None
         '''
         self._login = False
-        self._auth_info = None
 
         self._base_url = base_url
         self._tries = tries
@@ -87,9 +86,6 @@ class CrawlerHttpClient(object):
         Returns:
             requests.Response: requests.Response对象。
         '''
-        if self._login is False:
-            self.system_login()
-
         if not url.lower().startswith('http'):
             url = urlparse.urljoin(self._base_url, url)
 
@@ -177,17 +173,7 @@ class CrawlerHttpClient(object):
         Returns:
             bool: 标识是否登录成功。
         '''
-        self._auth_info = dict()
-        self._auth_info['user'] = user
-        self._auth_info['password'] = password
-        self._auth_info['callback'] = captcha_recognize_callback
-
-        if force is True:
-            return self._login()
         return True
-
-    def system_login(self):
-        self._login = True
 
 
 if __name__ == '__main__':
