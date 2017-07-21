@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import os
-import shevle
+import shelve
 
 
 class CacheFile(object):
@@ -17,7 +17,7 @@ class CacheFile(object):
     def __init__(self, cache_dir, cache_file_name):
         self._cache_dir = os.path.abspath(cache_dir)
         self._cache_file_name = cache_file_name
-        self._cache = shevle.open(
+        self._cache = shelve.open(
             os.path.join(cache_dir, cache_file_name))
 
     def flush(self):
@@ -49,8 +49,9 @@ class Cache(object):
     """
 
     def __init__(self, cache_dir="./"):
+        cache_dir = os.path.join(os.path.abspath(cache_dir), '.cache')
         if not os.path.exists(cache_dir):
-            os.mkdir(os.path.join(cache_dir, ".cache"))
+            os.mkdir(cache_dir)
         self._cache_dir = cache_dir
         self._object_cache = dict()
 
@@ -68,3 +69,9 @@ class Cache(object):
         cache = CacheFile(self._cache_dir, attr)
         self._object_cache[attr] = cache
         return cache
+
+if __name__ == "__main__":
+    cache = Cache()
+    cache.itjuzi['last_id'] = '1000'
+    cache.itjuzi.flush()
+    print(cache.itjuzi['last_id'])
