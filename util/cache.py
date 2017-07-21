@@ -32,16 +32,13 @@ class CacheFile(object):
         """支持通过'.'访问成员。"""
         return self._cache[attr]
 
-    def __setattr__(self, attr):
-        """支持通过'.'更改attr。"""
-
     def __setitem__(self, k, v):
         """代理shevle。"""
         self._cache[k] = v
 
     def __getitem__(self, k):
         """代理shevle。 """
-        return self._cache[k]
+        return self._cache.get(k)
 
     def __del__(self):
         """关闭Cache文件。 """
@@ -94,4 +91,6 @@ class Cache(object):
             del v
 
 if __name__ == "__main__":
-    pass
+    cache = Cache()
+    cache.itjuzi['last_id'] = 0
+    cache.itjuzi.flush()
