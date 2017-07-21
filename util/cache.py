@@ -47,6 +47,12 @@ class Cache(object):
 
     Returns:
         None
+
+    Demo:
+        >> cache = Cache()
+        >> cache.itjuzi['last_id'] = '1000'
+        >> cache.itjuzi.flush()
+        >> print(cache.itjuzi['last_id'])
     """
 
     def __init__(self, cache_dir="./"):
@@ -78,7 +84,4 @@ class Cache(object):
             del v
 
 if __name__ == "__main__":
-    cache = Cache()
-    cache.itjuzi['last_id'] = '1000'
-    cache.itjuzi.flush()
-    print(cache.itjuzi['last_id'])
+    pass
