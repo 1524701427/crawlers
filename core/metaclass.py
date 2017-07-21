@@ -15,6 +15,9 @@ class Final(type):
 
     Returns:
         class : 返回一个不可继承的封闭类。
+
+    Raises:
+        TypeError : 继承一个不可继承的类。
     """
 
     def __init__(self, cls, bases, namespace):
