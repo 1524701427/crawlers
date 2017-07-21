@@ -28,8 +28,15 @@ class CacheFile(object):
         """将数据刷新到缓存文件中。 """
         self._cache.sync()
 
+    def __getattr__(self, attr):
+        """支持通过'.'访问成员。"""
+        return self._cache[attr]
+
+    def __setattr__(self, attr):
+        """支持通过'.'更改attr。"""
+
     def __setitem__(self, k, v):
-        """代理shevle。 """
+        """代理shevle。"""
         self._cache[k] = v
 
     def __getitem__(self, k):
