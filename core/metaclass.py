@@ -19,7 +19,5 @@ class Final(type):
 
     def __init__(self, cls, bases, namespace):
         for base in bases:
-            if not isinstance(self, Final):
-                raise TypeError(
-                    "in" + cls + "definition" + cls +
-                    " can't be used as a base class.")
+            if isinstance(base, Final):
+                raise TypeError("final class %s." % base.__name__)
