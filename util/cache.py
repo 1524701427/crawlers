@@ -15,26 +15,27 @@ class CacheFile(object):
         None
     """
     def __init__(self, cache_dir, cache_file_name):
-        self._cache_dir = os.path.abspath(cache_dir)
+        self._cache_dir = cache_dir
         self._cache_file_name = cache_file_name
         self._cache = shelve.open(
-            os.path.join(cache_dir, cache_file_name))
+            os.path.join(cache_dir, cache_file_name),
+            flag='c', protocol=2, writeback=True,
+        )
 
     def flush(self):
-        """将数据刷新到缓存文件中。
-        """
+        """将数据刷新到缓存文件中。 """
         self._cache.sync()
 
     def __setitem__(self, k, v):
-        """代理shevle。"""
+        """代理shevle。 """
         self._cache[k] = v
 
     def __getitem__(self, k):
-        """代理shevle。"""
+        """代理shevle。 """
         return self._cache[k]
 
     def __del__(self):
-        """关闭Cache文件。"""
+        """关闭Cache文件。 """
         self._cache.close()
 
 
@@ -66,9 +67,10 @@ class Cache(object):
         """
         if attr in self._object_cache:
             return self._object_cache[attr]
-        cache = CacheFile(self._cache_dir, attr)
-        self._object_cache[attr] = cache
-        return cache
+        else:
+            cache = CacheFile(self._cache_dir, attr)
+            self._object_cache[attr] = cache
+            return cache
 
 if __name__ == "__main__":
     cache = Cache()
