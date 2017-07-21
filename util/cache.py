@@ -3,6 +3,8 @@
 import os
 import shelve
 
+from core.metaclass import Final
+
 
 class CacheFile(object):
     """缓存文件对象。
@@ -54,6 +56,7 @@ class Cache(object):
         >> cache.itjuzi.flush()
         >> print(cache.itjuzi['last_id'])
     """
+    __metaclass__ = Final
 
     def __init__(self, cache_dir="./"):
         cache_dir = os.path.join(os.path.abspath(cache_dir), '.cache')
