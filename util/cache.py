@@ -8,17 +8,25 @@ class CacheFile(object):
     """缓存文件对象。
 
     Args:
-        file_name (str): 文件名称。
+        cache_dir (str): 文件所在目录。
+        cache_file_name (str): 文件名称。
 
     Returns:
         None
     """
-    def __init__(self, file_name):
-        self._file = file_name
+    def __init__(self, cache_dir, cache_file_name):
+        self._cache_dir = os.path.abspath(cache_dir)
+        self._cache_file_name = cache_file_name
+        self._cache = shevle.open(
+            os.path.join(cache_dir, cache_file_name))
 
     def flush(self):
         """将数据刷新到缓存文件中。
         """
+
+    def __del__(self):
+        """关闭Cache文件。"""
+        self._cache.close()
 
 
 class Cache(object):
