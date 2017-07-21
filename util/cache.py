@@ -72,6 +72,11 @@ class Cache(object):
             self._object_cache[attr] = cache
             return cache
 
+    def __del__(self):
+        """析构方法，关闭所有Cache文件。"""
+        for _, v in self._object_cache.items():
+            del v
+
 if __name__ == "__main__":
     cache = Cache()
     cache.itjuzi['last_id'] = '1000'
