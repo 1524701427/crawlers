@@ -13,6 +13,6 @@ def timeit(func):
         t0 = time.time()
         res = func(*args, **kwargs)
         t1 = time.time()
-        print(">>> total time: " % round(t1 - t0, 2))
+        print(t1 - t0)
         return res
     return wrapper
