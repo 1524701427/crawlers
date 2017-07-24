@@ -72,7 +72,7 @@ class Cache(object):
     def __init__(self, cache_dir="./"):
         cache_dir = os.path.join(os.path.abspath(cache_dir), '.cache')
         if not os.path.exists(cache_dir):
-            os.mkdir(cache_dir)
+            os.mkdir(cache_dir, 744)
         self._cache_dir = cache_dir
         self._object_cache = dict()
 
@@ -92,6 +92,34 @@ class Cache(object):
             self._object_cache[attr] = cache
             return cache
 
+    def clear(self, cache=None, ignore_error=False):
+        """清除缓存。
+
+        Args:
+            cache (str): 待清除缓存的名称，例如itjuzi，默认清除全部。
+            ignore_error(bool): 是否忽略异常。
+
+        Returns:
+            None
+
+        Raises:
+            IOError: 待删除的缓存不存在。
+        """
+        if cache is None:
+            for _, v in self._object_cache.items():
+                del v
+            __import__('shutil').rmtree(self._cache_dir)
+        else:
+            try:
+                v = self._object_cache.get(cache)
+                if v is not None:
+                    del v
+                os.remove(
+                    os.path.join(self._cache_dir, '%s.db' % cache))
+            except IOError:
+                if ignore_error is not True:
+                    raise
+
     def __del__(self):
         """析构方法，关闭所有Cache文件。"""
         for _, v in self._object_cache.items():
@@ -102,3 +130,4 @@ if __name__ == "__main__":
     cache.itjuzi.last_id = 1000
     print(cache.itjuzi.last_id)
     cache.itjuzi.flush()
+    cache.clear('itjuzi')
