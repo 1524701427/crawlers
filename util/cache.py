@@ -32,6 +32,13 @@ class CacheFile(object):
         """支持通过'.'访问成员。"""
         return self._cache[attr]
 
+    def __setattr__(self, attr, value):
+        """支持通过'.'设置成员值。"""
+        if attr.startswith('_'):
+            super(CacheFile, self).__setattr__(attr, value)
+        else:
+            self._cache[attr] = value
+
     def __setitem__(self, k, v):
         """代理shevle。"""
         self._cache[k] = v
@@ -93,4 +100,5 @@ class Cache(object):
 if __name__ == "__main__":
     cache = Cache()
     cache.itjuzi['last_id'] = 0
+    cache.itjuzi.last_id = 1000
     cache.itjuzi.flush()
