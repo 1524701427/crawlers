@@ -150,7 +150,7 @@ def crawler(user, password):
     client = HttpClient(headers)
     client.login(user, password)
     last_id = get_last_id()
-    init_page = page = 0
+    init_page = page = 20
     delimiters = '>'*10
     url_tpl = (
         'http://www.itjuzi.com/company?sortby=inputtime&page=%(page)d')
@@ -168,75 +168,78 @@ def crawler(user, password):
 
             tag_ul = soup.select('ul[class="list-main-icnset list-main-com"]')[0]
             for idx, tag_li in enumerate(tag_ul.find_all('li')):
-                tag_is = [x for x in tag_li.find_all('i')]
-                tag_spans = [x for x in tag_li.find_all('span')]
-
-                project = dict()
-                project['url'] = tag_is[0].a['href']
-                print(project['url'])
-
-                project_id = int(project['url'].split('/')[-1])
-                project['id'] = project_id
-
-                # 运行到截止id退出
-                if project_id <= last_id:
-                    quit = True
-                    break
-
-                project['name'] = tag_li.p.a.string
-                project['industry'] = ''
                 try:
-                    project['industry'] = tag_spans[2].a.string
-                except:
-                    pass
+                    tag_is = [x for x in tag_li.find_all('i')]
+                    tag_spans = [x for x in tag_li.find_all('span')]
 
-                time.sleep(5)
-                detail_url = project['url']
-                detail_resp = client.get(detail_url)
+                    project = dict()
+                    project['url'] = tag_is[0].a['href']
+                    print(project['url'])
 
-                detail_soup = BeautifulSoup(detail_resp.text, 'lxml')
-                project['location'] = ''
-                locations = detail_soup.select('span[class="loca c-gray-aset"]')
-                if locations:
+                    project_id = int(project['url'].split('/')[-1])
+                    project['id'] = project_id
+
+                    # 运行到截止id退出
+                    if project_id <= last_id:
+                        quit = True
+                        break
+
+                    project['name'] = tag_li.p.a.string
+                    project['industry'] = ''
                     try:
-                        project['location'] = locations[0].a.string.strip()
+                        project['industry'] = tag_spans[2].a.string
                     except:
                         pass
 
-                # 项目状态
-                project['investing'] = ''
-                title_blocks = detail_soup.select('span[class="t-small c-green"]')
-                if title_blocks:
-                    # 去除掉两边的"(", ")"
-                    project['investing'] = title_blocks[0].string.strip()[1:-1]
+                    time.sleep(10)
+                    detail_url = project['url']
+                    detail_resp = client.get(detail_url)
 
-                div_link_line = detail_soup.select('div[class="link-line"]')[0]
-                project['web'] = ''
-                web_links = div_link_line.select('a[target="_blank"]')
-                for web_link in web_links:
-                    if web_link['href']:
-                        project['web'] = web_link['href'].strip()
-                        break
+                    detail_soup = BeautifulSoup(detail_resp.text, 'lxml')
+                    project['location'] = ''
+                    locations = detail_soup.select('span[class="loca c-gray-aset"]')
+                    if locations:
+                        try:
+                            project['location'] = locations[0].a.string.strip()
+                        except:
+                            pass
 
-                project['abstract'] = detail_soup.find(attrs={"name": "Description"})['content']
+                    # 项目状态
+                    project['investing'] = ''
+                    title_blocks = detail_soup.select('span[class="t-small c-green"]')
+                    if title_blocks:
+                        # 去除掉两边的"(", ")"
+                        project['investing'] = title_blocks[0].string.strip()[1:-1]
 
-                financings = []
-                tables = detail_soup.select('table[class="list-round-v2"]')
-                if tables:
-                    table = tables[0]
-                    for tr in table.find_all('tr'):
-                        financing = dict()
-                        tds = [x for x in tr.find_all("td")]
-                        financing['date'] = tds[0].span.string
-                        financing['round'] = tds[1].span.string
-                        financing['fee'] = tds[2].span.string
-                        financing['investors'] = [x for x in tds[3].strings if x != '\n']
-                        financings.append(financing)
-                project['financings'] = financings
-                projects.append(project)
-        time.sleep(5)
+                    div_link_line = detail_soup.select('div[class="link-line"]')[0]
+                    project['web'] = ''
+                    web_links = div_link_line.select('a[target="_blank"]')
+                    for web_link in web_links:
+                        if web_link['href']:
+                            project['web'] = web_link['href'].strip()
+                            break
+
+                    project['abstract'] = detail_soup.find(attrs={"name": "Description"})['content']
+
+                    financings = []
+                    tables = detail_soup.select('table[class="list-round-v2"]')
+                    if tables:
+                        table = tables[0]
+                        for tr in table.find_all('tr'):
+                            financing = dict()
+                            tds = [x for x in tr.find_all("td")]
+                            financing['date'] = tds[0].span.string
+                            financing['round'] = tds[1].span.string
+                            financing['fee'] = tds[2].span.string
+                            financing['investors'] = [x for x in tds[3].strings if x != '\n']
+                            financings.append(financing)
+                    project['financings'] = financings
+                    projects.append(project)
+                except:
+                    pass
+        time.sleep(10)
         # itjuzi最多可以爬50页数据
-        if page - init_page >= 100:
+        if page - init_page >= 20:
             break
     last_id = projects[0]['id']
     set_last_id(last_id)
