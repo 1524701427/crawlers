@@ -22,10 +22,14 @@ pip install -r requirements.txt -i http://pypi.doubanio.com/simple --trusted-hos
 QQ_MAIL_ACCOUNT = '' #  腾讯企业邮发件账户
 QQ_MAIL_PASSWORD = '' # 腾讯企业邮发件密码
 RECEIPTS = ['demo@qq.com'] # 收件人列表
+
+ITJUZI_USER = ''  # It桔子用户名
+ITJUZI_PASSWORD = '' # It桔子用户密码
 ```
 
 - 运行脚本
 
 ```shell
-python export.py
+python export.py  # 爬取影视剧信息
+python itjuze.py  # 爬去It桔子项目信息
 ``` 
