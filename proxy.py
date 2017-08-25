@@ -5,11 +5,13 @@
 from __future__ import with_statement
 from __future__ import print_function
 
+import sys
+import json
 import hashlib
+import traceback
 from collections import deque
 
 from core.enum import Enum
-from core.exceptions import ProxyPoolEmptyError
 
 
 class SchemaType(Enum):
@@ -21,13 +23,13 @@ class Proxy(object):
     """通用代理对象实现。
 
     Args:
-        schema (str): 制定代理schema，默认为'http'或'https'。
-        user (str): 用户名。
-        password (str): 用户密码。
         host (str): 代理主机。
         port (int): 代理端口。
+        schema (str): 制定代理schema，默认为'http'或'https'。
+        user (str): 用户名，默认为''。
+        password (str): 用户密码，默认为''。
     """
-    def __init__(self, schema, user, password, host, port):
+    def __init__(self,  host, port, schema='http', user='', password=''):
         assert schema in SchemaType.ALL_AVALIABLE_VALUES
         assert host
 
@@ -46,6 +48,7 @@ class Proxy(object):
 
     @classmethod
     def from_dict(cls, d):
+        # 可以考虑加入更多的序列化支持。
         keys = ['schema', 'user', 'password', 'host', 'port']
         for k in keys:
             if k not in d:
@@ -75,16 +78,60 @@ class Proxy(object):
 
 
 class ProxyPool(object):
-    """通用代理池实现。"""
+    """通用代理池实现。
+
+    Args:
+        max_size (int): 尺寸。
+    """
+    def __init__(self, max_size=None):
+        self.max_size = max_size
+        self.pool = deque(maxlen=max_size)
+        self.cursor = 0
+
+    def push(self, proxy):
+        self.pool.append(proxy)
+
+    def cycle(self):
+        """循环队列生成器。"""
+        while True:
+            if not self.pool:
+                raise StopIteration
+            yield self.pool[self.cursor]
+            self.cursor = (self.cursor + 1) % len(self.pool)
+
+    def load_from_json(self, json_file):
+        """从json文件中加载代理列表。"""
+        try:
+            with open(json_file, 'rt') as f:
+                data = json.loads(f.read())
+                for proxy in data:
+                    self.pool.append(Proxy.from_dict(proxy))
+        except IOError:
+            sys.stderr.write(traceback.format_exc())
+
+    def load_from_list(self, proxies):
+        """从列表中加载代理。"""
+        for proxy in proxies:
+            if not isinstance(proxy, Proxy):
+                continue
+            self.pool.append(proxy)
+
+    def feedback(self, proxy):
+        """代理可用性，可靠性等，反馈。"""
+        # hashcode用来快速查找，下面的host，port判断是为了防止避免哈希冲突。
+        for _proxy in self.pool:
+            if proxy.hashcode == _proxy.hashcode \
+                    and proxy.host == _proxy.host \
+                    and proxy.port == _proxy.port:
+                self.pool.remove(_proxy)
 
 
 if __name__ == '__main__':
-    proxy = Proxy.from_dict({
-        'schema': 'http',
-        'user': '',
-        'password': '',
-        'host': '127.0.0.1',
-        'port': 1080,
-    })
-    print(repr(proxy))
-    print(proxy.dict)
+    # 从网页上抓取一部分免费代理。
+    proxy1 = Proxy('114.85.113.31', 53281)
+    proxy2 = Proxy('223.13.69.86', 8118)
+    proxy3 = Proxy('101.68.73.54', 53281)
+    pool = ProxyPool()
+    pool.load_from_list([proxy1, proxy2, proxy3])
+    for proxy in pool.cycle():
+        print(proxy)

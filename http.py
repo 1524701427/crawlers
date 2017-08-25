@@ -56,15 +56,8 @@ class CrawlerHttpClient(object):
         self._try_internal = try_internal
         self._timeout = timeout
         self._proxies_pool = proxies_pool
-        if self._proxies_pool is not None:
-            self._generator = \
-                self._proxies_pool.iteritems(requests_style=True)
-
-        self._last_active_time = int(time.time())
-        self._count = 0
 
         self._s = requests.Session()
-        self._s.max_redirects = 10  # 最大允许10次重定向
 
         if default_headers is not None:
             self._s.headers.update(default_headers)
