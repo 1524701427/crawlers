@@ -14,6 +14,11 @@ from collections import deque
 from core.enum import Enum
 
 
+def error(err, *args):
+    """输出错误信息。"""
+    sys.stderr.write('%s\n' % err.format(args))
+
+
 class SchemaType(Enum):
     HTTP = 'http'  # HTTP协议
     HTTPS = 'https'  # HTTPS协议
@@ -39,16 +44,12 @@ class Proxy(object):
         self.password = password
         self.host = host
         self.port = port
+        self.keys = ['schema', 'user', 'password', 'host', 'port']
         self.hashcode = hashlib.md5(','.join([
-            self.schema,
-            self.user,
-            self.password,
-            self.host,
-            str(self.port)])).hexdigest()
+            str(getattr(self, k)) for k in self.keys])).hexdigest()
 
     @classmethod
     def from_dict(cls, d):
-        # 可以考虑加入更多的序列化支持。
         keys = ['schema', 'user', 'password', 'host', 'port']
         for k in keys:
             if k not in d:
@@ -60,12 +61,13 @@ class Proxy(object):
     @property
     def dict(self):
         d = dict()
-        for k in ['schema', 'user', 'password', 'host', 'port']:
+        for k in self.keys:
             d[k] = getattr(self, k)
         return d
 
     def __repr__(self):
-        return '<Proxy object at 0x%x, hashcode %s>' % (id(self), self.hashcode)  # noqa: E501
+        return '<Proxy object at 0x%x, hashcode %s>' % (
+            id(self), self.hashcode)
 
     def __str__(self):
         url = '%s://' % self.schema
@@ -81,7 +83,7 @@ class ProxyPool(object):
     """通用代理池实现。
 
     Args:
-        max_size (int): 尺寸。
+        max_size (int): 代理池容量，默认为None不限容量。
     """
     def __init__(self, max_size=None):
         self.max_size = max_size
@@ -89,13 +91,14 @@ class ProxyPool(object):
         self.cursor = 0
 
     def push(self, proxy):
+        """将代理放入代理池中。"""
         self.pool.append(proxy)
 
-    def cycle(self):
-        """循环队列生成器。"""
+    def iterator(self, schema):
+        """遍历代理池生成器。"""
+        if not self.pool:
+            raise StopIteration
         while True:
-            if not self.pool:
-                raise StopIteration
             yield self.pool[self.cursor]
             self.cursor = (self.cursor + 1) % len(self.pool)
 
@@ -109,16 +112,13 @@ class ProxyPool(object):
         except IOError:
             sys.stderr.write(traceback.format_exc())
 
-    def load_from_list(self, proxies):
-        """从列表中加载代理。"""
+    def load(self, proxies):
+        """一次性加载多个代理。"""
         for proxy in proxies:
-            if not isinstance(proxy, Proxy):
-                continue
             self.pool.append(proxy)
 
     def feedback(self, proxy):
         """代理可用性，可靠性等，反馈。"""
-        # hashcode用来快速查找，下面的host，port判断是为了防止避免哈希冲突。
         for _proxy in self.pool:
             if proxy.hashcode == _proxy.hashcode \
                     and proxy.host == _proxy.host \

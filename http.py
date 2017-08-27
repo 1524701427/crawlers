@@ -22,6 +22,7 @@ from requests.exceptions import (
 from core.exceptions import ProxyUnavaliableError
 
 __version__ = '1.0.0'
+__org__ = '360'
 __author__ = 'gatsby'
 __email__ = 'dreamcatchwang1991@gmail.com'
 

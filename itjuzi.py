@@ -4,7 +4,7 @@
 '''
 爬取it桔子项目的爬虫'''
 
-from __future__ import print_function
+# from __future__ import print_function
 
 import sys
 import time
@@ -60,7 +60,9 @@ class HttpClient(object):
             'page': None,
             'url': None,
         }
+        print 'sss'
         resp = self.s.post(url, data=data, headers={'Content-Type': content_type})
+        print 'ddd'
         print(resp)
         if resp is not None:
             for c in resp.cookies:
@@ -150,7 +152,7 @@ def crawler(user, password):
     client = HttpClient(headers)
     client.login(user, password)
     last_id = get_last_id()
-    init_page = page = 20
+    init_page = page = 0
     delimiters = '>'*10
     url_tpl = (
         'http://www.itjuzi.com/company?sortby=inputtime&page=%(page)d')
@@ -239,7 +241,7 @@ def crawler(user, password):
                     pass
         time.sleep(10)
         # itjuzi最多可以爬50页数据
-        if page - init_page >= 20:
+        if page - init_page >= 50:
             break
     last_id = projects[0]['id']
     set_last_id(last_id)
