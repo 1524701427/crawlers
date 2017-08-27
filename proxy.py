@@ -94,7 +94,7 @@ class ProxyPool(object):
         """将代理放入代理池中。"""
         self.pool.append(proxy)
 
-    def iterator(self, schema):
+    def iterator(self):
         """遍历代理池生成器。"""
         if not self.pool:
             raise StopIteration
@@ -124,14 +124,3 @@ class ProxyPool(object):
                     and proxy.host == _proxy.host \
                     and proxy.port == _proxy.port:
                 self.pool.remove(_proxy)
-
-
-if __name__ == '__main__':
-    # 从网页上抓取一部分免费代理。
-    proxy1 = Proxy('114.85.113.31', 53281)
-    proxy2 = Proxy('223.13.69.86', 8118)
-    proxy3 = Proxy('101.68.73.54', 53281)
-    pool = ProxyPool()
-    pool.load_from_list([proxy1, proxy2, proxy3])
-    for proxy in pool.cycle():
-        print(proxy)
