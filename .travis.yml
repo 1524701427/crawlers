@@ -1,12 +1,12 @@
 language: python
 
 python:
-    - "python2.5"
-    - "python2.7"
+    - "2.6"
+    - "2.7"
 
 install:
-    - "pip install -r requirements.txt -i http://pypi.doubanio.com/simple"
+    - pip install -r requirements.txt -i http://pypi.doubanio.com/simple
 
 script:
-    - "flake8 ./"
-    - "nosetests ./"
+    - flake8 ./
+    - nosetests ./
