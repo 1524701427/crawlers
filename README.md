@@ -1,5 +1,7 @@
 # export
 
+![build](https://api.travis-ci.org/keepalive555/export.svg?branch=master)
+
 ## 爬去一些网站数据的爬虫集合
 
 > **安装运行**
