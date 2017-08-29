@@ -4,3 +4,4 @@ gevent
 openpyxl
 lxml
 beautifulsoup4
+nose
