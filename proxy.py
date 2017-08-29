@@ -5,18 +5,13 @@
 from __future__ import with_statement
 from __future__ import print_function
 
-import sys
 import json
 import hashlib
 import traceback
 from collections import deque
 
 from core.enum import Enum
-
-
-def error(err, *args):
-    """输出错误信息。"""
-    sys.stderr.write('%s\n' % err.format(args))
+from util import error
 
 
 class SchemaType(Enum):
@@ -110,7 +105,7 @@ class ProxyPool(object):
                 for proxy in data:
                     self.pool.append(Proxy.from_dict(proxy))
         except IOError:
-            sys.stderr.write(traceback.format_exc())
+            error(traceback.format_exc())
 
     def load(self, proxies):
         """一次性加载多个代理。"""

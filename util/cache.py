@@ -127,8 +127,4 @@ class Cache(object):
 
 
 if __name__ == "__main__":
-    cache = Cache()
-    cache.itjuzi.last_id = 1000
-    print(cache.itjuzi.last_id)
-    cache.itjuzi.flush()
-    cache.clear('itjuzi')
+    pass
