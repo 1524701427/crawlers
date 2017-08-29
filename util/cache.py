@@ -125,6 +125,7 @@ class Cache(object):
         for _, v in self._object_cache.items():
             del v
 
+
 if __name__ == "__main__":
     cache = Cache()
     cache.itjuzi.last_id = 1000
