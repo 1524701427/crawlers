@@ -5,3 +5,4 @@ openpyxl
 lxml
 beautifulsoup4
 nose
+flake8
