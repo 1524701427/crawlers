@@ -53,20 +53,7 @@ class CacheFile(object):
 
 
 class Cache(object):
-    """爬虫缓存系统。
 
-    Args:
-        cache_dir (str): 缓存数据的目录。
-
-    Returns:
-        None
-
-    Demo:
-        >> cache = Cache()
-        >> cache.itjuzi['last_id'] = '1000'
-        >> cache.itjuzi.flush()
-        >> print(cache.itjuzi['last_id'])
-    """
     __metaclass__ = Final
 
     def __init__(self, cache_dir="./"):
