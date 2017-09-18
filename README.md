@@ -45,6 +45,7 @@ ITJUZI_PASSWORD = '' # ITt桔子用户密码
 - 运行爬虫
 
 ```bash
+mkdir -p ~/log
 cd cralwers && ../env/bin/python export.py  # 爬取影视剧信息
 cd cralwers && ../env/bin/python itjuzi.py  # 爬去It桔子项目信息
 ```
