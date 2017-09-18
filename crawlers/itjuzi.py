@@ -60,9 +60,7 @@ class HttpClient(object):
             'page': None,
             'url': None,
         }
-        print 'sss'
         resp = self.s.post(url, data=data, headers={'Content-Type': content_type})
-        print 'ddd'
         print(resp)
         if resp is not None:
             for c in resp.cookies:
@@ -241,7 +239,7 @@ def crawler(user, password):
                     pass
         time.sleep(10)
         # itjuzi最多可以爬50页数据
-        if page - init_page >= 50:
+        if page - init_page >= 30:
             break
     last_id = projects[0]['id']
     set_last_id(last_id)

@@ -5,8 +5,8 @@
 
 import nose
 
-from export.itjuzi_copy import get_last_id
-from export.itjuzi_copy import set_last_id
+from crawlers.itjuzi_copy import get_last_id
+from crawlers.itjuzi_copy import set_last_id
 
 
 def setup():
