@@ -81,7 +81,7 @@ def export(projects):
     stdstyle.font = font
     stdstyle.alignment = alignment
     xls_headers = [
-        u'项目名称', u'地址',  u'细分领域', u'项目连接', u'项目简介', u'融资情况'
+        u'项目名称', u'地址',  u'细分领域', u'项目连接', u'项目简介', u'轮次', u'融资情况'
     ]
     for i, header in enumerate(xls_headers, 1):
         sheet.cell(row=1, column=i, value=header)
@@ -101,7 +101,20 @@ def export(projects):
         cell = sheet.cell(row=row, column=5, value=project['abstract'])
         cell.font = font
         cell.alignment = Alignment(wrap_text=True)
-        cell = sheet.cell(row=row, column=6, value=project['investing'])
+        financing_round = project['investing']
+        cell = sheet.cell(row=row, column=6, value=financing_round)
+        cell.style = stdstyle
+        cell = sheet.cell(row=row, column=7, value=project['investing'])
+        last_round = None
+        if project['financings']:
+            last_round = project['financings'][0]
+        if financing_round not in [u'尚未获投', u'获投状态：不明确'] and last_round:
+            cell = sheet.cell(
+                row=row, column=7, value= '%s %s %s %s' % (
+                    last_round['date'],
+                    last_round['round'],
+                    last_round['fee'],
+                    ','.join(last_round['investors'])))
         cell.style = stdstyle
     # 自动调整列宽
     dims = dict()
@@ -123,34 +136,11 @@ def export(projects):
     mail_multipart(email)
 
 
-def get_last_id():
-    '''获取上次爬取的截止id'''
-    try:
-        with open('last_id', 'rt') as f:
-            last_id = f.read()
-            last_id = int(last_id.strip())
-    except IOError:
-        last_id = 67960
-        with open('last_id', 'wt') as f:
-            f.write(str(last_id))
-        assert last_id > 0
-    finally:
-        return last_id
-
-
-def set_last_id(last_id):
-    '''设置上次爬去的截止id'''
-    with open('last_id', 'wt') as f:
-        f.write('%d\n' % last_id)
-        return last_id
-
-
 def crawler(user, password):
     '''it桔子爬虫'''
     client = HttpClient(headers)
     client.login(user, password)
-    last_id = get_last_id()
-    init_page = page = 0
+    init_page = page = 40
     delimiters = '>'*10
     url_tpl = (
         'http://www.itjuzi.com/company?sortby=inputtime&page=%(page)d')
@@ -163,10 +153,8 @@ def crawler(user, password):
         resp = client.get(url)
         if resp is not None:
             soup = BeautifulSoup(resp.text, 'lxml')
-            if DEBUG is True:
-                print(soup)
 
-            tag_ul = soup.select('ul[class="list-main-icnset list-main-com"]')[0]
+            tag_ul = soup.select('ul[class="list-main-icnset company-list-ul"]')[0]
             for idx, tag_li in enumerate(tag_ul.find_all('li')):
                 try:
                     tag_is = [x for x in tag_li.find_all('i')]
@@ -176,22 +164,10 @@ def crawler(user, password):
                     project['url'] = tag_is[0].a['href']
                     print(project['url'])
 
-                    project_id = int(project['url'].split('/')[-1])
-                    project['id'] = project_id
-
-                    # 运行到截止id退出
-                    if project_id <= last_id:
-                        quit = True
-                        break
-
-                    project['name'] = tag_li.p.a.string
+                    project['name'] = ''
                     project['industry'] = ''
-                    try:
-                        project['industry'] = tag_spans[2].a.string
-                    except:
-                        pass
 
-                    time.sleep(10)
+                    time.sleep(15)
                     detail_url = project['url']
                     detail_resp = client.get(detail_url)
 
@@ -201,6 +177,20 @@ def crawler(user, password):
                     if locations:
                         try:
                             project['location'] = locations[0].a.string.strip()
+                        except:
+                            pass
+
+                    industry = detail_soup.select('span[class="scope c-gray-aset"]')
+                    if industry:
+                        try:
+                            project['industry'] = industry[0].a.string.strip()
+                        except:
+                            pass
+
+                    name = detail_soup.select('h1[class="seo-important-title"]')
+                    if name:
+                        try:
+                            project['name'] = tag_li.div.div.a.span.string.strip()
                         except:
                             pass
 
@@ -237,12 +227,10 @@ def crawler(user, password):
                     projects.append(project)
                 except:
                     pass
-        time.sleep(10)
+        time.sleep(15)
         # itjuzi最多可以爬50页数据
-        if page - init_page >= 30:
+        if page - init_page >= 10:
             break
-    last_id = projects[0]['id']
-    set_last_id(last_id)
     return projects
 
 
