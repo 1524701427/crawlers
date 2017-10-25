@@ -30,7 +30,6 @@ DEBUG = False
 class HttpClient(object):
 
     def __init__(self, default_headers=None, tries=3, try_internal=0.5):
-        assert 1 <= tries <= 5
         self.tries = tries
         self.try_internal = 3
         self.s = requests.Session()
@@ -50,7 +49,6 @@ class HttpClient(object):
         return resp
 
     def login(self, user, password):
-        # 建议抽象化为基类，以后使用，增加验证码识别模块
         url = 'https://www.itjuzi.com/user/login?redirect=&flag='
         content_type = 'application/x-www-form-urlencoded'
         data = {
@@ -61,7 +59,6 @@ class HttpClient(object):
             'url': None,
         }
         resp = self.s.post(url, data=data, headers={'Content-Type': content_type})
-        print(resp)
         if resp is not None:
             for c in resp.cookies:
                 print('>', c.name, '=', c.value)
@@ -140,7 +137,7 @@ def crawler(user, password):
     '''it桔子爬虫'''
     client = HttpClient(headers)
     client.login(user, password)
-    init_page = page = 40
+    init_page = page = 0
     delimiters = '>'*10
     url_tpl = (
         'http://www.itjuzi.com/company?sortby=inputtime&page=%(page)d')
@@ -210,6 +207,9 @@ def crawler(user, password):
                             break
 
                     project['abstract'] = detail_soup.find(attrs={"name": "Description"})['content']
+                    project['abstract'] = project['abstract'].strip()
+                    if project['abstract'][-1] not in (u'。', u'.'):
+                        project['abstract'] = project['abstract'] + u'。'
 
                     financings = []
                     tables = detail_soup.select('table[class="list-round-v2"]')
@@ -229,7 +229,7 @@ def crawler(user, password):
                     pass
         time.sleep(15)
         # itjuzi最多可以爬50页数据
-        if page - init_page >= 10:
+        if page - init_page >= 5:
             break
     return projects
 
