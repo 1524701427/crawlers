@@ -161,6 +161,11 @@ def crawler(user, password):
                     project['url'] = tag_is[0].a['href']
                     print(project['url'])
 
+                    project['location'] = ''
+                    _is = tag_li.select('i[class="cell place"]')
+                    if _is:
+                        project['location'] = _is[0].string.strip()
+
                     project['name'] = ''
                     project['industry'] = ''
 
@@ -169,18 +174,17 @@ def crawler(user, password):
                     detail_resp = client.get(detail_url)
 
                     detail_soup = BeautifulSoup(detail_resp.text, 'lxml')
-                    project['location'] = ''
-                    locations = detail_soup.select('span[class="loca c-gray-aset"]')
-                    if locations:
-                        try:
-                            project['location'] = locations[0].a.string.strip()
-                        except:
-                            pass
+                    #  locations = detail_soup.select('span[class="loca c-gray-aset"]')
+                    #  if locations:
+                    #      try:
+                    #          project['location'] = locations[0].a.string.strip()
+                    #      except:
+                    #          pass
 
-                    industry = detail_soup.select('span[class="scope c-gray-aset"]')
+                    industry = detail_soup.select('a[class="one-level-tag"]')
                     if industry:
                         try:
-                            project['industry'] = industry[0].a.string.strip()
+                            project['industry'] = industry[0].string.strip()
                         except:
                             pass
 
@@ -224,12 +228,13 @@ def crawler(user, password):
                             financing['investors'] = [x for x in tds[3].strings if x != '\n']
                             financings.append(financing)
                     project['financings'] = financings
+                    # print(project)
                     projects.append(project)
                 except:
                     pass
         time.sleep(15)
         # itjuzi最多可以爬50页数据
-        if page - init_page >= 5:
+        if page - init_page >= 13:
             break
     return projects
 
