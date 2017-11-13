@@ -2,7 +2,9 @@
 
 ![build](https://api.travis-ci.org/keepalive555/export.svg?branch=master)
 
-## 一些常用网站爬虫集合
+## 爬虫集合
+
+工程收集了笔者日常工作生活中，用到的一些爬虫案例，实现比较简单，并未用到一些复杂的爬虫技术。不积跬步无以至千里，希望自己可以完成量到质的成长。
 
 ### 环境配置
 
@@ -27,7 +29,21 @@ virtualenv env && source env/bin/active
 pip install -r requirements.txt -i http://pypi.doubanio.com/simple --trusted-host pypi.doubanio.com
 ```
 
-- 配置配置文件
+***注意：*** `html`解析库`lxml`是由`c`语言编写的，用`pip`安装需要一些依赖库，如下：
+
+- Debian/Ubuntu
+
+```bash
+sudo apt-get install libxml2-dev libxslt-dev python-dev
+```
+
+- CentOS
+
+```bash
+sudo yum install libxml2 libxmls-devel libxslt-devel python-devel
+```
+
+### 配置文件
 
 根据模板生成配置文件：`cp config_sample.py config.py`
 
@@ -42,7 +58,7 @@ ITJUZI_USER = ''  # IT桔子用户名
 ITJUZI_PASSWORD = '' # ITt桔子用户密码
 ```
 
-- 运行爬虫
+### 运行爬虫
 
 ```bash
 mkdir -p ~/log
