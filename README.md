@@ -1,6 +1,6 @@
 # crawlers
 
-![build](https://api.travis-ci.org/keepalive555/export.svg?branch=master)
+![build](https://travis-ci.org/keepalive555/crawlers.svg?branch=master)
 
 ## 爬虫集合
 
