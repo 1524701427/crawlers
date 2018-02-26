@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 
-'''
-常用装饰器。'''
+"""常用装饰器。"""
 
 import time
 import functools

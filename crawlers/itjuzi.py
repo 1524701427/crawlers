@@ -4,10 +4,9 @@
 '''
 爬取it桔子项目的爬虫'''
 
-# from __future__ import print_function
-
 import sys
 import time
+import random
 from datetime import date
 
 import requests
@@ -18,13 +17,19 @@ from bs4 import BeautifulSoup
 import config
 from mail import mail_multipart
 
+UAs = [
+    'Mozilla/5.0 (Windows; U; Windows NT 6.1; en-us) AppleWebKit/534.50 (KHTML, like Gecko) Version/5.1 Safari/534.50',
+    'Mozilla/5.0 (compatible; MSIE 9.0; Windows NT 6.1; Trident/5.0;',
+    'Mozilla/4.0 (compatible; MSIE 8.0; Windows NT 6.0; Trident/4.0)',
+    'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.6; rv:2.0.1) Gecko/20100101 Firefox/4.0.1',
+    'Opera/9.80 (Macintosh; Intel Mac OS X 10.6.8; U; en) Presto/2.8.131 Version/11.11',
+]
+
 headers = {
     'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
     'Accept-Encoding': 'gzip, deflate, sdch, br',
-    'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36',
+    'User-Agent': random.choice(UAs),
 }
-
-DEBUG = False
 
 
 class HttpClient(object):
@@ -33,12 +38,13 @@ class HttpClient(object):
         self.tries = tries
         self.try_internal = 3
         self.s = requests.Session()
-        if headers is not None:
-            self.s.headers.update(headers)
+        if default_headers is not None:
+            self.s.headers.update(default_headers)
 
     def get(self, url):
         for i in range(1, self.tries+1):
             try:
+                self.s.headers.update({'User-Agent': random.choice(UAs)})
                 resp = self.s.get(url)
                 break
             except:
@@ -136,11 +142,11 @@ def export(projects):
 def crawler(user, password):
     '''it桔子爬虫'''
     client = HttpClient(headers)
-    client.login(user, password)
+    # client.login(user, password)
     init_page = page = 0
     delimiters = '>'*10
     url_tpl = (
-        'http://www.itjuzi.com/company?sortby=inputtime&page=%(page)d')
+        'https://www.itjuzi.com/company?sortby=inputtime&page=%(page)d')
     quit = False
     projects = []
     while quit is False:
@@ -150,7 +156,9 @@ def crawler(user, password):
         resp = client.get(url)
         if resp is not None:
             soup = BeautifulSoup(resp.text, 'lxml')
+            print(soup)
 
+            # tag_ul = soup.select('ul[class="list-main-icnset company-list-ul"]')[0]
             tag_ul = soup.select('ul[class="list-main-icnset company-list-ul"]')[0]
             for idx, tag_li in enumerate(tag_ul.find_all('li')):
                 try:
@@ -234,7 +242,7 @@ def crawler(user, password):
                     pass
         time.sleep(15)
         # itjuzi最多可以爬50页数据
-        if page - init_page >= 13:
+        if page - init_page >= 8:
             break
     return projects
 
