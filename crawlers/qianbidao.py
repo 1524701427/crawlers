@@ -20,6 +20,7 @@ from config import (
 )
 from util.http import HttpClient
 from util.mail import mail_multipart
+from util.decorators import singleton
 
 
 class QianBiDaoCrawler(object):
@@ -129,6 +130,9 @@ class QianBiDaoCrawler(object):
 
 
 if __name__ == '__main__':
-    cralwer = QianBiDaoCrawler(QIANBIDAO_USER, QIANBIDAO_PASSWORD)
-    cralwer.login()
-    cralwer.run()
+    @singleton('/tmp/qianbidao.pid')
+    def go():
+        cralwer = QianBiDaoCrawler(QIANBIDAO_USER, QIANBIDAO_PASSWORD)
+        cralwer.login()
+        cralwer.run()
+    go()

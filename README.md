@@ -13,19 +13,18 @@
 
 ## 环境配置
 
-`git clone`远程仓库至本地：
+① `git clone`远程仓库至本地：
 
 ```bash
 git clone git@github.com:keepalive555/crawlers.git
 ```
-新建`Python`虚拟运行环境
+② 新建`Python`虚拟运行环境
 
 ```bash
 cd crawlers/
 virtualenv env && source env/bin/active
 ```
-
-安装`Python`依赖库
+③安装`Python`依赖库
 
 ```bash
 pip install -r requirements.txt -i http://pypi.doubanio.com/simple --trusted-host pypi.doubanio.com
@@ -72,4 +71,8 @@ cd cralwers && ../env/bin/python itjuzi.py  # 爬取IT桔子项目信息
 cd cralwers && ../env/bin/python qianbidao.py  # 爬取铅笔道项目信息
 ```
 
-在服务器上运行，可以考虑`supervisor`或者`nohup`后台运行。
+在服务器上运行，可以考虑`supervisor`或者`nohup`后台运行，以铅笔道为例：
+
+```bash
+nohup cd cralwers && ../env/bin/python qianbidao.py > log.txt 2>&1
+```
