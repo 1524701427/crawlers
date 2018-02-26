@@ -15,7 +15,7 @@ from openpyxl.styles import Font, Border, Side, NamedStyle, Alignment
 from bs4 import BeautifulSoup
 
 import config
-from mail import mail_multipart
+from util.mail import mail_multipart
 
 UAs = [
     'Mozilla/5.0 (Windows; U; Windows NT 6.1; en-us) AppleWebKit/534.50 (KHTML, like Gecko) Version/5.1 Safari/534.50',
