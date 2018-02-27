@@ -112,7 +112,7 @@ class QianBiDaoCrawler(object):
                             _round['investor']))
                         if idx == 0:
                             last_stage_name = _round['stage_name']
-                    project['finance_round'] = '\n'.join(rounds)
+                    project['finance_round'] = '\r'.join(rounds)
                     project['finance'] = last_stage_name \
                         if last_stage_name \
                         else item['finance_round'] or u'尚未获投'
