@@ -29,9 +29,9 @@ virtualenv env && source env/bin/active
 ```bash
 pip install -r requirements.txt -i http://pypi.doubanio.com/simple --trusted-host pypi.doubanio.com
 ```
-> ***注意：*** 
+> ***注意事项：***
 > 
-> 工程引用的`html`解析库`lxml`是由`c`语言编写的，用`pip`安装需要首先安装一些`Python`依赖库，如下：
+> 爬虫引用的`html`解析库`lxml`是由`c`语言编写的，若`python`使用则需要首先安装一些`Python`系统库库。常用`Linux`发型版本安装指南如下：
 > 
 > - Debian/Ubuntu
 > 
@@ -53,6 +53,7 @@ pip install -r requirements.txt -i http://pypi.doubanio.com/simple --trusted-hos
 ```python
 QQ_MAIL_ACCOUNT = ''  #  腾讯企业邮发件账户
 QQ_MAIL_PASSWORD = ''  # 腾讯企业邮发件密码
+
 RECEIPTS = ['demo@qq.com']  # 收件人列表
 
 ITJUZI_USER = ''  # IT桔子用户名
@@ -71,8 +72,8 @@ cd cralwers && ../env/bin/python itjuzi.py  # 爬取IT桔子项目信息
 cd cralwers && ../env/bin/python qianbidao.py  # 爬取铅笔道项目信息
 ```
 
-在服务器上运行，可以考虑`supervisor`或者`nohup`后台运行，以铅笔道为例：
+在服务器上运行，可以考虑配置`supervisor`守护进程或者手动使用`nohup`命令后台运行：
 
 ```bash
-nohup cd cralwers && ../env/bin/python qianbidao.py > log.txt 2>&1
+nohup cd cralwers && ../env/bin/python qianbidao.py > log.txt 2>&1 &
 ```
