@@ -84,7 +84,8 @@ class QianBiDaoCrawler(object):
             u'项目简介', u'融资轮次', u'融资情况', u'项目来源']
         for idx, header in enumerate(headers, 1):
             sheet.cell(row=1, column=idx, value=header)
-        while True:
+        quit = False
+        while quit is False:
             url = url_tpl % dict(page=page)
             print('>>>', url)
             resp = self.httpclient.get(url, headers=dict(token=self.token))
@@ -97,7 +98,6 @@ class QianBiDaoCrawler(object):
                     project['description'] = item['description']
                     project['web'] = ''
                     project['industry'] = item['industry'][0]
-                    project['finance'] = item['finance_round'] or u'尚未获投'
                     time.sleep(1)
                     detail_info = self.get_item_detail(project['id'])
                     detail_info = detail_info['content']
@@ -110,11 +110,13 @@ class QianBiDaoCrawler(object):
                             _round['money_raised'],
                             _round['investor']))
                     project['finance_round'] = '\n'.join(rounds)
+                    project['finance'] = rounds[-1] \
+                        if rounds else item['finance_round'] or u'尚未获投'
                     projects.append(project)
+                    if len(projects) > 16:
+                        quit = True
             time.sleep(1)
             page += 1
-            if page > 1:
-                break
         for idx, project in enumerate(projects, 2):
             sheet.cell(row=idx, column=1, value=project['name'])
             sheet.cell(row=idx, column=2, value=project['region'])
