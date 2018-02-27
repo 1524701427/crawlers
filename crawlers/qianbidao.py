@@ -103,15 +103,19 @@ class QianBiDaoCrawler(object):
                     detail_info = detail_info['content']
                     project['region'] = detail_info['project']['region_name']
                     rounds = list()
-                    for _round in detail_info.get('rounds', []):
+                    last_stage_name = ''
+                    for idx, _round in enumerate(detail_info.get('rounds', [])):  # noqa
                         rounds.append('%s %s %s %s\n' % (
-                            _round['annouced_time'],
+                            _round['annouced_time'].replace('-', '.'),
                             _round['stage_name'],
                             _round['money_raised'],
                             _round['investor']))
+                        if idx == 0:
+                            last_stage_name = _round['stage_name']
                     project['finance_round'] = '\n'.join(rounds)
-                    project['finance'] = rounds[-1] \
-                        if rounds else item['finance_round'] or u'尚未获投'
+                    project['finance'] = last_stage_name \
+                        if last_stage_name \
+                        else item['finance_round'] or u'尚未获投'
                     projects.append(project)
                     if len(projects) > 16:
                         quit = True
