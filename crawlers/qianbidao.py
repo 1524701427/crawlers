@@ -21,6 +21,9 @@ from config import (
 from util.http import HttpClient
 from util.mail import mail_multipart
 from util.decorators import singleton
+from util.cache import Cache
+
+cache = Cache()
 
 
 class QianBiDaoCrawler(object):
@@ -85,6 +88,7 @@ class QianBiDaoCrawler(object):
         for idx, header in enumerate(headers, 1):
             sheet.cell(row=1, column=idx, value=header)
         quit = False
+        last_id = cache.qianbidao.last_id
         while quit is False:
             url = url_tpl % dict(page=page)
             print('>>>', url)
@@ -94,28 +98,31 @@ class QianBiDaoCrawler(object):
                 for item in data['data']['items']:
                     project = dict()
                     project['id'] = item['id']
+                    if last_id == project['id']:
+                        quit = True
+                        break
                     project['name'] = item['name']
                     project['description'] = item['description']
                     project['web'] = ''
-                    project['industry'] = item['industry'][0]
+                    project['industry'] = item['industry'][0] \
+                        if item['industry'] else ''
                     time.sleep(1)
                     detail_info = self.get_item_detail(project['id'])
                     detail_info = detail_info['content']
                     project['region'] = detail_info['project']['region_name']
                     rounds = detail_info.get('rounds', [])
+                    project['finance_round'] = u'获投状态不明确'
                     if rounds:
                         last_round = rounds[0]
                         project['finance_round'] = '%s %s %s %s' % (
-                                last_round['annouced_time'].replace('-', '.'),
+                                last_round['annouced_time'],
                                 last_round['stage_name'],
                                 last_round['money_raised'],
                                 last_round['investor'])
                     project['finance'] = last_round['stage_name'] \
                         if rounds else u'尚未获投'
                     projects.append(project)
-                    if len(projects) > 16:
-                        quit = True
-            time.sleep(1)
+            time.sleep(0.5)
             page += 1
         for idx, project in enumerate(projects, 2):
             sheet.cell(row=idx, column=1, value=project['name'])
@@ -126,6 +133,8 @@ class QianBiDaoCrawler(object):
             sheet.cell(row=idx, column=6, value=project['finance'])
             sheet.cell(row=idx, column=7, value=project['finance_round'])
             sheet.cell(row=idx, column=8, value=u'铅笔道')
+        if projects:
+            cache.qianbidao.last_id = projects[0]['id']
         self.xlsx_name = u'%s 铅笔道项目' % datetime.date.today()
         workbook.save(u'%s.xlsx' % self.xlsx_name)
         self.send_mail()

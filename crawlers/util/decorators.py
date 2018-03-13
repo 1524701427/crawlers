@@ -2,10 +2,11 @@
 
 """常用装饰器。"""
 
+from __future__ import print_function
+
 import time
 import functools
 import fcntl
-from functools import wraps
 import os
 
 
@@ -15,14 +16,14 @@ def timeit(func):
         t0 = time.time()
         res = func(*args, **kwargs)
         t1 = time.time()
-        print(t1 - t0)
+        print(">>>", t1 - t0)
         return res
     return wrapper
 
 
 def singleton(pid_filename):
     def decorator(f):
-        @wraps(f)
+        @functools.wraps(f)
         def decorated(*args, **kwargs):
             pid = str(os.getpid())
             pidfile = open(pid_filename, 'a+')

@@ -1,18 +1,16 @@
 # -*- coding: utf-8 -*-
 
+"""HTTP客户端实现。"""
+
 import time
 import collections
 
 import requests
 
-from const import (
-    PROXY_AVALIABLE,
-    PROXY_UNAVALIABLE,
-)
+from const import PROXY_AVALIABLE, PROXY_UNAVALIABLE
 
 
 class Proxy(object):
-    """代理。"""
 
     def __init__(self, schema, host, port, user=None, password=None):
         self.schema = schema

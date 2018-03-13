@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 
+"""本地缓存系统实现。"""
+
 import os
 import shelve
 
