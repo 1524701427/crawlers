@@ -23,7 +23,7 @@ from util.mail import mail_multipart
 from util.cache import Cache
 from util.decorators import singleton
 
-cache = Cache(default_values={'qianbidao': {'last_id': ''}})
+cache = Cache(default_values={'qianbidao': {'last_id': '55c433b917a672bd'}})
 
 
 class QianBiDaoCrawler(object):

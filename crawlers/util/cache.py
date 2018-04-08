@@ -24,9 +24,7 @@ class CacheFile(object):
         self._cache.sync()
 
     def __getattr__(self, attr):
-        cache = object.__getattr__(self, '_cache')
-        default_values = object.__getattr__(self, '_default_values')  # noqa
-        return cache[attr] if attr in cache else default_values[attr]
+        return self._cache[attr] if attr in self._cache else self._default_values[attr]  # noqa: E501
 
     def __setattr__(self, attr, value):
         if attr.startswith('_'):
@@ -60,8 +58,8 @@ class Cache(object):
         if attr in self._caches:
             return self._caches[attr]
         else:
-            cache = CacheFile(self._cache_dir, attr, None)  # noqa: E501
-            self._cache[attr] = cache
+            cache = CacheFile(self._cache_dir, attr, self._default_values.get(attr))  # noqa: E501
+            self._caches[attr] = cache
             return cache
 
     def clear(self, cache=None, ignore_error=False):
