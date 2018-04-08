@@ -11,7 +11,7 @@ import datetime
 import openpyxl
 
 from const import (
-    HTTP_OK,
+    HttpStatus,
 )
 from config import (
     QIANBIDAO_USER,
@@ -20,10 +20,10 @@ from config import (
 )
 from util.http import HttpClient
 from util.mail import mail_multipart
-from util.decorators import singleton
 from util.cache import Cache
+from util.decorators import singleton
 
-cache = Cache()
+cache = Cache(default_values={'qianbidao': {'last_id': ''}})
 
 
 class QianBiDaoCrawler(object):
@@ -34,6 +34,7 @@ class QianBiDaoCrawler(object):
         'Accept-Language': 'zh-Hans-CN;q=1, en-CN;q=0.9',
         'Authority': 'api.pencilnews.cn',
     }
+    login_url = 'https://api.pencilnews.cn/user/login'
 
     def __init__(self, username, password):
         self.httpclient = HttpClient(default_headers=self.QianBiDaoAppHeaders)
@@ -54,10 +55,10 @@ class QianBiDaoCrawler(object):
         """登录铅笔道"""
         data = dict(username=self.username, password=self.password)
         resp = self.httpclient.post(
-            'https://api.pencilnews.cn/user/login',
+            self.login_url,
             data=data,
             verify=False)
-        if resp and resp.status_code == HTTP_OK:
+        if resp and resp.status_code == HttpStatus.StatusOk:
             ret = resp.json()
             if ret and ret['message'] == 'SUCCESS':
                 self.token = ret['data']['user']['token']
@@ -68,7 +69,7 @@ class QianBiDaoCrawler(object):
         url = 'https://api.pencilnews.cn/pay-project/detail?id=%s' % item_id
         print('>>>>>>', url)
         resp = self.httpclient.get(url, headers=dict(token=self.token))
-        if resp and resp.status_code == HTTP_OK:
+        if resp and resp.status_code == HttpStatus.StatusOk:
             data = resp.json()
             if data['message'] == 'SUCCESS':
                 return data['data']
@@ -93,7 +94,7 @@ class QianBiDaoCrawler(object):
             url = url_tpl % dict(page=page)
             print('>>>', url)
             resp = self.httpclient.get(url, headers=dict(token=self.token))
-            if resp and resp.status_code == HTTP_OK:
+            if resp and resp.status_code == HttpStatus.StatusOk:
                 data = resp.json()
                 for item in data['data']['items']:
                     project = dict()
@@ -141,6 +142,9 @@ class QianBiDaoCrawler(object):
 
 
 if __name__ == '__main__':
+    # import sys
+    # sys.exit(0)
+
     @singleton('/tmp/qianbidao.pid')
     def go():
         cralwer = QianBiDaoCrawler(QIANBIDAO_USER, QIANBIDAO_PASSWORD)

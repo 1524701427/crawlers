@@ -9,48 +9,38 @@ from core.metaclass import Final
 
 
 class CacheFile(object):
-    """缓存文件对象。
 
-    Args:
-        cache_dir (str): 文件所在目录。
-        cache_file_name (str): 文件名称，不带扩展名。
-
-    Returns:
-        None
-    """
-    def __init__(self, cache_dir, cache_file_name):
+    def __init__(self, cache_dir, cache_filename, default_values=None):
         self._cache_dir = cache_dir
-        self._cache_file_name = cache_file_name
+        self._cache_filename = cache_filename
+        self._default_values = default_values or dict()
         self._cache = shelve.open(
-            os.path.join(cache_dir, cache_file_name),
-            flag='c', protocol=2, writeback=True,
-        )
+            os.path.join(self._cache_dir, self._cache_filename),
+            flag='c',
+            protocol=2,
+            writeback=True)
 
     def flush(self):
-        """将数据刷新到缓存文件中。 """
         self._cache.sync()
 
     def __getattr__(self, attr):
-        """支持通过'.'访问成员。"""
-        return self._cache[attr]
+        cache = object.__getattr__(self, '_cache')
+        default_values = object.__getattr__(self, '_default_values')  # noqa
+        return cache[attr] if attr in cache else default_values[attr]
 
     def __setattr__(self, attr, value):
-        """支持通过'.'设置成员值。"""
         if attr.startswith('_'):
             super(CacheFile, self).__setattr__(attr, value)
         else:
             self._cache[attr] = value
 
     def __setitem__(self, k, v):
-        """代理shevle。"""
         self._cache[k] = v
 
     def __getitem__(self, k):
-        """代理shevle。 """
         return self._cache.get(k)
 
     def __del__(self):
-        """关闭Cache文件。 """
         self._cache.close()
 
 
@@ -58,61 +48,36 @@ class Cache(object):
 
     __metaclass__ = Final
 
-    def __init__(self, cache_dir="./"):
+    def __init__(self, cache_dir="./", default_values=None):
         cache_dir = os.path.join(os.path.abspath(cache_dir), '.cache')
         if not os.path.exists(cache_dir):
-            os.mkdir(cache_dir, 744)
+            os.mkdir(cache_dir, 777)
         self._cache_dir = cache_dir
-        self._object_cache = dict()
+        self._caches = dict()
+        self._default_values = default_values or dict()
 
     def __getattr__(self, attr):
-        """通过属性来访问相应APP。
-
-        Args:
-            attr (str): 属性名，一般是爬虫APP名，如itjuzi。
-
-        Returns:
-            None
-        """
-        if attr in self._object_cache:
-            return self._object_cache[attr]
+        if attr in self._caches:
+            return self._caches[attr]
         else:
-            cache = CacheFile(self._cache_dir, attr)
-            self._object_cache[attr] = cache
+            cache = CacheFile(self._cache_dir, attr, None)  # noqa: E501
+            self._cache[attr] = cache
             return cache
 
     def clear(self, cache=None, ignore_error=False):
-        """清除缓存。
-
-        Args:
-            cache (str): 待清除缓存的名称，例如itjuzi，默认清除全部。
-            ignore_error(bool): 是否忽略异常。
-
-        Returns:
-            None
-
-        Raises:
-            IOError: 待删除的缓存不存在。
-        """
         if cache is None:
-            for _, v in self._object_cache.items():
+            for _, v in self._caches.items():
                 del v
             __import__('shutil').rmtree(self._cache_dir)
         else:
             try:
-                v = self._object_cache.get(cache)
+                v = self._caches.get(cache)
                 if v is not None:
                     del v
-                os.remove(
-                    os.path.join(self._cache_dir, '%s.db' % cache))
+                os.remove(os.path.join(self._cache_dir, '%s.db' % cache))
             except IOError:
                 if ignore_error is not True:
                     raise
-
-    def __del__(self):
-        """析构方法，关闭所有Cache文件。"""
-        for _, v in self._object_cache.items():
-            del v
 
 
 if __name__ == "__main__":

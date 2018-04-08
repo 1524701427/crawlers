@@ -1,4 +1,4 @@
-config.py
 *.pyc
-last_id
 .cache
+config.py
+last_id
