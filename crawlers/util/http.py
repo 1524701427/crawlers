@@ -7,7 +7,10 @@ import collections
 
 import requests
 
-from const import PROXY_AVALIABLE, PROXY_UNAVALIABLE
+from const import (
+    PROXY_AVALIABLE,
+    PROXY_UNAVALIABLE
+)
 
 
 class Proxy(object):

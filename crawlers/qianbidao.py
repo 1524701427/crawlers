@@ -5,6 +5,7 @@
 from __future__ import print_function
 
 
+import sys
 import time
 import datetime
 
@@ -150,7 +151,11 @@ if __name__ == '__main__':
 
     @singleton('/tmp/qianbidao.pid')
     def go():
-        cralwer = QianBiDaoCrawler(QIANBIDAO_USER, QIANBIDAO_PASSWORD)
-        cralwer.login()
-        cralwer.run()
+        try:
+            # 捕获全局异常
+            cralwer = QianBiDaoCrawler(QIANBIDAO_USER, QIANBIDAO_PASSWORD)
+            cralwer.login()
+            cralwer.run()
+        except:
+            sys.exit(-1)
     go()
