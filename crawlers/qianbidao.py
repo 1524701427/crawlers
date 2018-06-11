@@ -5,7 +5,6 @@
 from __future__ import print_function
 
 
-import sys
 import time
 import datetime
 
@@ -22,7 +21,7 @@ from config import (
 from util.http import HttpClient
 from util.mail import mail_multipart
 from util.cache import Cache
-from util.decorators import singleton
+from util.decorators import singleton, retry
 
 cache = Cache(default_values={'qianbidao': {'last_id': '55c433b917a672bd'}})
 
@@ -150,12 +149,14 @@ class QianBiDaoCrawler(object):
 if __name__ == '__main__':
 
     @singleton('/tmp/qianbidao.pid')
+    @retry()
     def go():
         try:
             # 捕获全局异常
             cralwer = QianBiDaoCrawler(QIANBIDAO_USER, QIANBIDAO_PASSWORD)
             cralwer.login()
             cralwer.run()
+            return 0
         except:
-            sys.exit(-1)
+            return -1
     go()

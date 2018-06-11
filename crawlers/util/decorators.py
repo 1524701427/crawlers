@@ -48,3 +48,22 @@ def singleton(pid_filename):
             return ret
         return decorated
     return decorator
+
+
+def retry(times=3):
+    """重试执行"""
+    def decorator(f):
+        @functools.wraps(f)
+        def decorated(*args, **kwargs):
+            res = None
+            for i in range(times):
+                if i > 0:
+                    print('retry...')
+                res = f(*args, **kwargs)
+                if res != -1:
+                    break
+            else:
+                print('retry failed...')
+            return res
+        return decorated
+    return decorator
