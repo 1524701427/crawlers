@@ -104,12 +104,17 @@ class QianBiDaoCrawler(object):
                         break
                     project['name'] = item['name']
                     project['description'] = item['description']
-                    project['web'] = ''
                     project['industry'] = item['industry'][0] \
                         if item['industry'] else ''
                     time.sleep(1)
                     detail_info = self.get_item_detail(project['id'])
                     detail_info = detail_info['content']
+                    project['web'] = ''
+                    project_follow = detail_info.get('projectFollow')
+                    if project_follow:
+                        project['web'] = project_follow.get('company_website', '')  # noqa: E501
+                    if not project['web']:
+                        project['web'] = project_follow.get('project_public_num', '')  # noqa: E501
                     project['region'] = detail_info['project']['region_name']
                     rounds = detail_info.get('rounds', [])
                     project['finance_round'] = u'获投状态不明确'
@@ -142,8 +147,6 @@ class QianBiDaoCrawler(object):
 
 
 if __name__ == '__main__':
-    # import sys
-    # sys.exit(0)
 
     @singleton('/tmp/qianbidao.pid')
     def go():
