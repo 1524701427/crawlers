@@ -74,8 +74,7 @@ class HttpClient(object):
         if default_headers is not None:
             self.session.headers.update(default_headers)
 
-    def get(self, url, proxies=None, headers=None):
-        options = dict()
+    def get(self, url, proxies=None, headers=None, **options):
         schema2proxy = dict(verify=False)
         if proxies is not None:
             for proxy in proxies:
