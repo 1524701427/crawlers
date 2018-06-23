@@ -10,6 +10,12 @@ from const import (
 )
 from util.uapool import DeviceType, UAPool
 from util.http import HttpClient
+# from util.mail import mail_multipart
+from util.decorators import (
+    singleton,
+    retry,
+    caught_exception
+)
 
 
 class ItjuziCrawler(object):
@@ -48,6 +54,9 @@ class ItjuziCrawler(object):
                 print('%s=%s' % (cookie.name, cookie.value))
             print('END==============')
 
+    def get_project_detail(self, _id):
+        """获取项目详情"""
+
     def run(self):
         """运行。"""
         page = 1
@@ -65,9 +74,13 @@ class ItjuziCrawler(object):
                     print(e)
                     continue
             page += 1
-            if page >= 2:
-                break
 
 
 if __name__ == '__main__':
-    pass
+    """爬虫执行"""
+    @singleton('/tmp/itjuzi.pid')
+    @retry(times=3)
+    @caught_exception(['luckydreamcatcher@163.com'])
+    def go():
+        pass
+    go()

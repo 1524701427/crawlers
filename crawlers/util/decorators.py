@@ -19,12 +19,13 @@ def timeit(func):
         t0 = time.time()
         res = func(*args, **kwargs)
         t1 = time.time()
-        print(">>>", t1 - t0)
+        print("time coast: ", t1 - t0)
         return res
     return wrapper
 
 
 def singleton(pid_filename):
+    """单例模式"""
     def decorator(f):
         @functools.wraps(f)
         def decorated(*args, **kwargs):
@@ -62,10 +63,11 @@ def retry(times=3):
             if times <= 0:
                 return res
             for i in range(times):
-                res = f(*args, **kwargs)
-                if res != -1:
-                    break
-                print('retry...')
+                try:
+                    res = f(*args, **kwargs)
+                except:
+                    print('retry...')
+                    continue
             else:
                 print('retry failed...')
             return res
