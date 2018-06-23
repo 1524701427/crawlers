@@ -6,8 +6,11 @@ from __future__ import print_function
 
 import time
 import functools
+import traceback
 import fcntl
 import os
+
+from util.mail import mail_multipart
 
 
 def timeit(func):
@@ -56,14 +59,33 @@ def retry(times=3):
         @functools.wraps(f)
         def decorated(*args, **kwargs):
             res = None
+            if times <= 0:
+                return res
             for i in range(times):
-                if i > 0:
-                    print('retry...')
                 res = f(*args, **kwargs)
                 if res != -1:
                     break
+                print('retry...')
             else:
                 print('retry failed...')
             return res
         return decorated
+    return decorator
+
+
+def caught_exception(receipts, subject=u'爬虫异常'):
+    """捕获异常"""
+    def decorator(f):
+        @functools.wraps(f)
+        def wrapper(*args, **kwargs):
+            try:
+                res = f(*args, **kwargs)
+                return res
+            except:
+                email = dict()
+                email['to'] = receipts
+                email['subject'] = subject
+                email['html'] = traceback.format_exc()
+                mail_multipart(email)
+        return wrapper
     return decorator

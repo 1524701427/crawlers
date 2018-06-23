@@ -46,10 +46,10 @@ class ItjuziCrawler(object):
             print('SUCCEED! ===================================>')  # noqa
             for cookie in resp.cookies:
                 print('%s=%s' % (cookie.name, cookie.value))
-                print(dir(cookie))
             print('END==============')
 
     def run(self):
+        """运行。"""
         page = 1
         url_tpl = 'http://radar.itjuzi.com/company/infonew?page=%(page)d'
         quit = False
