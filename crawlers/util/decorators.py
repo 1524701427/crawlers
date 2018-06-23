@@ -10,6 +10,8 @@ import traceback
 import fcntl
 import os
 
+from datetime import datetime
+
 from util.mail import mail_multipart
 
 
@@ -70,12 +72,13 @@ def retry(times=3):
                     continue
             else:
                 print('retry failed...')
+                raise
             return res
         return decorated
     return decorator
 
 
-def caught_exception(receipts, subject=u'爬虫异常'):
+def caught_exception(receipts, subject=u'爬虫异常', debug=False):
     """捕获异常"""
     def decorator(f):
         @functools.wraps(f)
@@ -84,9 +87,11 @@ def caught_exception(receipts, subject=u'爬虫异常'):
                 res = f(*args, **kwargs)
                 return res
             except:
+                if debug is True:
+                    raise
                 email = dict()
                 email['to'] = receipts
-                email['subject'] = subject
+                email['subject'] = subject + datetime.now().strftime('%Y-%m-%d %H:%M:%S')  # noqa: E501
                 email['html'] = traceback.format_exc()
                 mail_multipart(email)
         return wrapper

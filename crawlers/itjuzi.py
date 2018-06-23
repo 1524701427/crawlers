@@ -17,6 +17,8 @@ from util.decorators import (
     caught_exception
 )
 
+import config
+
 
 class ItjuziCrawler(object):
 
@@ -74,13 +76,16 @@ class ItjuziCrawler(object):
                     print(e)
                     continue
             page += 1
+            break
 
 
 if __name__ == '__main__':
     """爬虫执行"""
     @singleton('/tmp/itjuzi.pid')
+    @caught_exception(['luckydreamcatcher@163.com'], debug=True)
     @retry(times=3)
-    @caught_exception(['luckydreamcatcher@163.com'])
     def go():
-        pass
+        cralwer = ItjuziCrawler(config.ITJUZI_USER, config.ITJUZI_PASSWORD)
+        cralwer.login()
+        cralwer.run()
     go()
